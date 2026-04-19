@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NestDrift Kenya</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sand:#F5EFE4;--clay:#C8A882;--terra:#C96A3A;--bark:#3D2B1F;--fog:#E8E2D8;
+  --moss:#5C6E50;--cream:#FAF7F2;--gold:#D4A853;--red:#C0392B;--blue:#2980B9;
+  --green:#27AE60;--purple:#8E44AD;--dark:#1A1A2E;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--bark);overflow-x:hidden;}
+/* ── GLOBAL UTILS ── */
+.hidden{display:none!important;}
+.btn{padding:11px 24px;border-radius:30px;font-family:'DM Sans',sans-serif;font-weight:500;font-size:0.88rem;cursor:pointer;border:none;transition:all .2s;}
+.btn-terra{background:var(--terra);color:#fff;} .btn-terra:hover{background:var(--bark);}
+.btn-bark{background:var(--bark);color:#fff;} .btn-bark:hover{background:var(--terra);}
+.btn-outline{background:transparent;border:1.5px solid rgba(61,43,31,.25);color:var(--bark);}
+.btn-outline:hover{border-color:var(--terra);color:var(--terra);}
+.btn-green{background:var(--green);color:#fff;} .btn-green:hover{filter:brightness(1.1);}
+.btn-gold{background:var(--gold);color:var(--bark);} .btn-gold:hover{filter:brightness(1.1);}
+/* ── MODAL OVERLAY ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;}
+.modal{background:#fff;border-radius:24px;padding:40px 36px;max-width:440px;width:100%;position:relative;box-shadow:0 24px 60px rgba(0,0,0,.2);}
+.modal h2{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:900;color:var(--bark);margin-bottom:6px;}
+.modal p{font-size:.85rem;opacity:.6;margin-bottom:26px;line-height:1.6;}
+.modal-close{position:absolute;top:16px;right:18px;font-size:1.2rem;cursor:pointer;opacity:.4;border:none;background:none;font-size:1.4rem;line-height:1;}
+.modal-close:hover{opacity:1;}
+.role-select{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:22px;}
+.role-btn{padding:14px 10px;border-radius:14px;border:2px solid var(--fog);background:var(--cream);cursor:pointer;text-align:center;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.role-btn:hover{border-color:var(--terra);}
+.role-btn.active{border-color:var(--terra);background:rgba(201,106,58,.07);}
+.role-btn .role-icon{font-size:1.6rem;display:block;margin-bottom:5px;}
+.role-btn .role-name{font-size:.78rem;font-weight:600;color:var(--bark);}
+.form-group{margin-bottom:15px;}
+.form-label{font-size:.73rem;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--bark);display:block;margin-bottom:5px;}
+.form-input{width:100%;padding:11px 14px;border-radius:11px;border:1.5px solid rgba(61,43,31,.15);font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--bark);background:var(--cream);outline:none;transition:border-color .2s;}
+.form-input:focus{border-color:var(--terra);}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.auth-switch{text-align:center;font-size:.82rem;margin-top:16px;opacity:.65;}
+.auth-switch span{color:var(--terra);cursor:pointer;font-weight:600;}
+.auth-switch span:hover{text-decoration:underline;}
+/* ── PAYWALL MODAL ── */
+.paywall-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0;}
+.pay-opt{border:2px solid var(--fog);border-radius:14px;padding:14px;cursor:pointer;transition:all .2s;text-align:center;}
+.pay-opt:hover,.pay-opt.active{border-color:var(--terra);background:rgba(201,106,58,.06);}
+.pay-opt .pay-icon{font-size:1.6rem;margin-bottom:5px;}
+.pay-opt .pay-name{font-size:.8rem;font-weight:600;color:var(--bark);}
+.pay-opt .pay-detail{font-size:.7rem;opacity:.5;margin-top:2px;}
+.mpesa-input{margin-top:14px;}
+.pay-summary{background:var(--fog);border-radius:12px;padding:14px 16px;margin:14px 0;font-size:.82rem;line-height:1.7;}
+.pay-summary strong{color:var(--terra);}
+/* ── NAV ── */
+nav{position:fixed;top:0;width:100%;z-index:500;display:flex;align-items:center;justify-content:space-between;padding:14px 48px;background:rgba(250,247,242,.94);backdrop-filter:blur(14px);border-bottom:1px solid rgba(200,168,130,.2);}
+.logo{font-family:'Playfair Display',serif;font-size:1.45rem;font-weight:900;color:var(--bark);display:flex;align-items:center;gap:6px;}
+.logo span{color:var(--terra);}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--terra);}
+.nav-links{display:flex;gap:13px;align-items:center;}
+.nav-tab{cursor:pointer;padding:8px 16px;border-radius:22px;font-weight:500;font-size:.82rem;border:1.5px solid transparent;transition:all .2s;user-select:none;background:transparent;font-family:'DM Sans',sans-serif;}
+.nav-tab.active{background:var(--bark);color:var(--cream);}
+.nav-tab:not(.active):hover{border-color:var(--bark);}
+.nav-user{display:flex;align-items:center;gap:10px;}
+.nav-avatar{width:34px;height:34px;border-radius:50%;background:var(--terra);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;cursor:pointer;}
+.nav-role-badge{font-size:.68rem;font-weight:600;padding:3px 10px;border-radius:12px;}
+.role-tenant-badge{background:rgba(92,110,80,.15);color:var(--moss);}
+.role-landlord-badge{background:rgba(201,106,58,.15);color:var(--terra);}
+.role-admin-badge{background:rgba(142,68,173,.15);color:var(--purple);}
+/* ── PAGES ── */
+.page{display:none;}.page.active{display:block;}
+/* ── HERO ── */
+.hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;padding-top:68px;overflow:hidden;}
+.hero-left{padding:60px 40px 60px 56px;display:flex;flex-direction:column;justify-content:center;}
+.eyebrow{font-size:.7rem;font-weight:500;letter-spacing:2.5px;text-transform:uppercase;color:var(--terra);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.eyebrow::before{content:'';width:22px;height:1.5px;background:var(--terra);}
+.hero-title{font-family:'Playfair Display',serif;font-size:clamp(2.4rem,4vw,4.2rem);font-weight:900;line-height:1.06;letter-spacing:-1.5px;color:var(--bark);margin-bottom:20px;}
+.hero-title em{font-style:italic;color:var(--terra);}
+.hero-sub{font-size:.95rem;line-height:1.78;color:var(--bark);opacity:.62;max-width:400px;margin-bottom:34px;}
+.hero-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+.hero-stats{display:flex;gap:28px;margin-top:42px;padding-top:28px;border-top:1px solid rgba(200,168,130,.3);}
+.snum{font-family:'Playfair Display',serif;font-size:1.75rem;font-weight:700;color:var(--bark);line-height:1;}
+.slbl{font-size:.7rem;color:var(--bark);opacity:.5;margin-top:3px;}
+.hero-right{position:relative;background:var(--bark);overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 30% 60%,rgba(201,106,58,.25) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(200,168,130,.15) 0%,transparent 50%);}
+.deco{position:absolute;inset:0;overflow:hidden;}
+.deco::before{content:'';position:absolute;width:250px;height:250px;border-radius:50%;border:1px solid rgba(200,168,130,.15);top:-40px;right:-40px;}
+.deco::after{content:'';position:absolute;width:160px;height:160px;border-radius:50%;border:1px solid rgba(200,168,130,.1);bottom:40px;left:20px;}
+.app-mock{position:relative;z-index:2;width:248px;background:var(--cream);border-radius:30px;padding:18px 15px;box-shadow:0 40px 80px rgba(0,0,0,.4);animation:float 5s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.mock-notch{width:28px;height:4px;background:var(--bark);border-radius:3px;opacity:.15;margin:0 auto 10px;}
+.mock-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.mock-htitle{font-family:'Playfair Display',serif;font-size:.86rem;font-weight:700;color:var(--bark);}
+.mock-pill{background:rgba(201,106,58,.1);color:var(--terra);font-size:.62rem;font-weight:500;padding:2px 8px;border-radius:14px;}
+.mock-card{background:var(--fog);border-radius:14px;overflow:hidden;margin-bottom:8px;}
+.mock-img{width:100%;height:92px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;background:linear-gradient(135deg,#C8A882,#9B7A5C);}
+.mock-ci{padding:8px 10px;}
+.mock-cn{font-weight:600;font-size:.76rem;color:var(--bark);}
+.mock-cs{font-size:.62rem;color:var(--bark);opacity:.5;}
+.mock-cp{font-family:'Playfair Display',serif;font-weight:700;font-size:.82rem;color:var(--terra);margin-top:3px;}
+.mock-price-teaser{font-size:.64rem;color:var(--bark);opacity:.5;margin-top:2px;font-style:italic;}
+.mock-tags{display:flex;gap:3px;margin-top:4px;flex-wrap:wrap;}
+.mock-tag{font-size:.54rem;font-weight:500;background:rgba(61,43,31,.08);color:var(--bark);padding:2px 5px;border-radius:7px;}
+.mock-btns{display:flex;gap:6px;margin-top:6px;padding-top:6px;border-top:1px solid rgba(200,168,130,.3);}
+.mock-btn{flex:1;padding:7px;border-radius:10px;font-size:.66rem;font-weight:500;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;}
+.mock-btn.pass{background:var(--fog);color:var(--bark);opacity:.6;}
+.mock-btn.match{background:var(--terra);color:white;}
+.badge-fl{position:absolute;background:white;border-radius:12px;padding:8px 12px;box-shadow:0 8px 28px rgba(0,0,0,.15);font-size:.72rem;font-weight:600;color:var(--bark);display:flex;align-items:center;gap:7px;z-index:3;animation:float 5s ease-in-out infinite;}
+.badge-fl.top{top:14%;right:5%;animation-delay:-2s;}
+.badge-fl.bot{bottom:15%;left:4%;animation-delay:-1s;}
+.bsub{font-size:.58rem;opacity:.5;font-weight:400;}
+/* ── SECTION COMMON ── */
+.sl{font-size:.68rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--terra);font-weight:500;display:flex;align-items:center;gap:8px;margin-bottom:11px;}
+.sl::before{content:'';width:16px;height:1.5px;background:var(--terra);}
+.st{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,2.6vw,2.5rem);font-weight:900;line-height:1.1;letter-spacing:-.8px;color:var(--bark);margin-bottom:28px;}
+.st em{font-style:italic;color:var(--terra);}
+/* ── LISTINGS ── */
+.listings-sec{padding:88px 52px 70px;}
+.filters-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px;align-items:center;}
+.fsel{padding:8px 30px 8px 13px;border-radius:20px;border:1.5px solid rgba(61,43,31,.18);font-family:'DM Sans',sans-serif;font-size:.79rem;color:var(--bark);background:white;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5' viewBox='0 0 9 5'%3E%3Cpath d='M.5.5l4 4 4-4' stroke='%233D2B1F' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;transition:border-color .2s;}
+.fsel:focus{border-color:var(--terra);}
+.fbtn{padding:8px 18px;border-radius:20px;border:none;background:var(--terra);color:white;font-family:'DM Sans',sans-serif;font-size:.79rem;font-weight:500;cursor:pointer;}
+.fbtn:hover{background:var(--bark);}
+.listings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(275px,1fr));gap:18px;}
+/* ── LISTING CARD ── */
+.lcard{background:white;border-radius:18px;overflow:hidden;transition:all .3s;box-shadow:0 2px 12px rgba(61,43,31,.06);cursor:pointer;position:relative;}
+.lcard:hover{transform:translateY(-5px);box-shadow:0 18px 36px rgba(61,43,31,.12);}
+.lbadge{position:absolute;top:11px;left:11px;color:white;font-size:.62rem;font-weight:600;padding:3px 10px;border-radius:14px;z-index:5;}
+.lbadge.perfect{background:var(--terra);}
+.lbadge.flex-m{background:var(--moss);}
+.lbadge.featured{background:var(--gold);color:var(--bark);}
+.lsave{position:absolute;top:10px;right:10px;width:29px;height:29px;background:rgba(255,255,255,.88);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;cursor:pointer;border:none;z-index:5;}
+/* CAROUSEL */
+.carousel{position:relative;height:175px;overflow:hidden;}
+.car-inner{display:flex;height:100%;transition:transform .38s ease;}
+.car-slide{min-width:100%;height:100%;}
+.slide-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2.4rem;}
+.car-btn{position:absolute;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.85);border:none;cursor:pointer;font-size:.78rem;display:flex;align-items:center;justify-content:center;z-index:4;}
+.car-prev{left:7px;}.car-next{right:7px;}
+.car-dots{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);display:flex;gap:4px;z-index:4;}
+.cdot{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.5);}
+.cdot.on{background:white;}
+/* card body */
+.lbody{padding:13px 14px;}
+.lloc{font-size:.68rem;color:var(--terra);font-weight:500;margin-bottom:3px;}
+.lname{font-family:'Playfair Display',serif;font-size:.92rem;font-weight:700;color:var(--bark);margin-bottom:2px;line-height:1.2;}
+.lreg{font-size:.68rem;color:var(--bark);opacity:.45;margin-bottom:9px;}
+/* PUBLIC PRICE DISPLAY — shows starting price with lock icon */
+.lprice-public{display:flex;align-items:center;gap:8px;}
+.lprice-public .price-from{font-size:.62rem;opacity:.5;font-weight:400;}
+.lprice-public .price-num{font-family:'Playfair Display',serif;font-size:1.12rem;font-weight:900;color:var(--bark);}
+.lprice-public .price-per{font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:400;opacity:.5;}
+.lprice-lock{display:flex;align-items:center;gap:5px;background:rgba(201,106,58,.08);padding:4px 10px;border-radius:10px;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:background .2s;}
+.lprice-lock:hover{background:rgba(201,106,58,.15);}
+.lprice-lock .lock-icon{font-size:.8rem;}
+.lprice-lock .lock-text{font-size:.68rem;color:var(--terra);font-weight:600;}
+/* authenticated price */
+.lprice-auth .price-num{font-family:'Playfair Display',serif;font-size:1.12rem;font-weight:900;color:var(--bark);}
+.lprice-auth .price-per{font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:400;opacity:.5;}
+.lprice-auth .price-breakdown{font-size:.65rem;color:var(--moss);margin-top:1px;}
+.lmeta{display:flex;gap:10px;margin-top:7px;padding-top:7px;border-top:1px solid var(--fog);}
+.lm{font-size:.67rem;color:var(--bark);opacity:.54;}
+.ltags{display:flex;gap:4px;flex-wrap:wrap;margin-top:7px;}
+.ltag{font-size:.59rem;background:var(--fog);color:var(--bark);padding:2px 7px;border-radius:8px;font-weight:500;}
+.lactions{display:flex;gap:7px;margin-top:10px;}
+.la{flex:1;padding:8px;border-radius:10px;font-size:.72rem;font-weight:500;cursor:pointer;border:none;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.la.tour{background:var(--bark);color:white;}.la.tour:hover{background:var(--terra);}
+.la.sv{background:var(--fog);color:var(--bark);}
+/* contact-gated */
+.contact-gate{display:flex;align-items:center;gap:7px;background:rgba(201,106,58,.06);border:1px dashed rgba(201,106,58,.3);border-radius:10px;padding:8px 12px;cursor:pointer;margin-top:8px;transition:background .2s;border:none;width:100%;font-family:'DM Sans',sans-serif;}
+.contact-gate:hover{background:rgba(201,106,58,.12);}
+.contact-gate span{font-size:.73rem;color:var(--terra);font-weight:500;}
+/* ── FEATURES ── */
+.features-sec{padding:88px 52px;background:var(--sand);}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:44px;}
+.fcard{background:var(--cream);padding:32px 26px;position:relative;transition:all .3s;overflow:hidden;}
+.fcard:hover{background:var(--bark);}
+.fcard:hover .fc-title,.fcard:hover .fc-num{color:rgba(250,247,242,.06);}
+.fcard:hover .fc-title-t{color:var(--cream);}
+.fcard:hover .fc-desc{color:rgba(250,247,242,.56);}
+.fcard:hover .fc-icon{background:rgba(201,106,58,.2);}
+.fc-num{position:absolute;top:12px;right:18px;font-family:'Playfair Display',serif;font-size:4.2rem;font-weight:900;color:rgba(61,43,31,.05);line-height:1;transition:color .3s;}
+.fc-icon{width:42px;height:42px;border-radius:11px;background:rgba(201,106,58,.1);display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:14px;transition:background .3s;}
+.fc-title-t{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--bark);margin-bottom:7px;transition:color .3s;}
+.fc-desc{font-size:.79rem;line-height:1.7;color:var(--bark);opacity:.6;transition:color .3s;}
+/* ── MATCH ── */
+.match-sec{padding:0 52px 88px;display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.mc{border-radius:22px;padding:36px 30px;position:relative;overflow:hidden;}
+.mc.perfect{background:var(--terra);color:white;}
+.mc.flex{background:var(--fog);color:var(--bark);}
+.mc-tag{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.2);border-radius:16px;padding:4px 11px;font-size:.68rem;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:15px;}
+.mc.flex .mc-tag{background:rgba(61,43,31,.1);}
+.mc-h{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;line-height:1.1;margin-bottom:10px;}
+.mc-p{font-size:.82rem;line-height:1.7;opacity:.8;}
+.mc-deco{position:absolute;right:-16px;bottom:-16px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.08);}
+.mc.flex .mc-deco{background:rgba(61,43,31,.06);}
+/* ── CTA ── */
+.cta-strip{margin:0 52px 70px;background:var(--bark);border-radius:24px;padding:50px 58px;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden;}
+.cta-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 80% 50%,rgba(201,106,58,.3) 0%,transparent 60%);}
+.cta-text{position:relative;z-index:2;}
+.cta-h{font-family:'Playfair Display',serif;font-size:1.85rem;font-weight:900;color:var(--cream);line-height:1.15;letter-spacing:-.5px;margin-bottom:7px;}
+.cta-h em{font-style:italic;color:var(--clay);}
+.cta-p{color:rgba(250,247,242,.5);font-size:.85rem;}
+.cta-btns{display:flex;gap:9px;flex-direction:column;position:relative;z-index:2;}
+.app-btn{display:flex;align-items:center;gap:10px;background:rgba(250,247,242,.1);border:1px solid rgba(250,247,242,.15);color:var(--cream);padding:11px 16px;border-radius:12px;cursor:pointer;text-decoration:none;min-width:155px;}
+.app-btn-label{font-size:.58rem;opacity:.6;display:block;}
+.app-btn-name{font-weight:600;font-size:.82rem;}
+/* ── TENANT DASHBOARD ── */
+.dashboard{padding:88px 52px 70px;}
+.dash-grid{display:grid;grid-template-columns:240px 1fr;gap:28px;min-height:500px;}
+.dash-sidebar{background:white;border-radius:20px;padding:24px 20px;box-shadow:0 2px 12px rgba(61,43,31,.06);height:fit-content;position:sticky;top:90px;}
+.dash-avatar{width:64px;height:64px;border-radius:50%;background:var(--terra);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 14px;}
+.dash-username{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;text-align:center;color:var(--bark);}
+.dash-role{text-align:center;font-size:.7rem;opacity:.5;margin-bottom:20px;margin-top:3px;}
+.sidebar-nav{display:flex;flex-direction:column;gap:4px;}
+.snav-item{padding:10px 14px;border-radius:11px;font-size:.83rem;font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:9px;color:var(--bark);border:none;background:transparent;width:100%;font-family:'DM Sans',sans-serif;text-align:left;}
+.snav-item:hover{background:var(--fog);}
+.snav-item.active{background:var(--bark);color:var(--cream);}
+.snav-item .si-icon{font-size:1rem;width:20px;text-align:center;}
+.dash-main{}
+.dash-panel{display:none;}.dash-panel.active{display:block;}
+.dash-card{background:white;border-radius:18px;padding:24px 22px;box-shadow:0 2px 12px rgba(61,43,31,.06);margin-bottom:18px;}
+.dash-card h3{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--bark);margin-bottom:16px;}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.stat-card{background:white;border-radius:14px;padding:18px 16px;box-shadow:0 2px 12px rgba(61,43,31,.06);border-left:3px solid var(--terra);}
+.stat-card.green{border-left-color:var(--green);}
+.stat-card.blue{border-left-color:var(--blue);}
+.stat-card.purple{border-left-color:var(--purple);}
+.stat-card.gold{border-left-color:var(--gold);}
+.stat-num{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:900;color:var(--bark);}
+.stat-label{font-size:.72rem;color:var(--bark);opacity:.5;margin-top:3px;}
+.stat-change{font-size:.65rem;margin-top:5px;}
+.stat-change.up{color:var(--green);}
+.stat-change.down{color:var(--red);}
+/* table */
+.data-table{width:100%;border-collapse:collapse;}
+.data-table th{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.3px;color:var(--bark);opacity:.5;padding:10px 12px;text-align:left;border-bottom:2px solid var(--fog);}
+.data-table td{padding:11px 12px;font-size:.82rem;color:var(--bark);border-bottom:1px solid var(--fog);}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:rgba(245,239,228,.4);}
+.status-badge{padding:3px 9px;border-radius:10px;font-size:.65rem;font-weight:600;}
+.sb-active{background:rgba(39,174,96,.12);color:var(--green);}
+.sb-pending{background:rgba(212,168,83,.15);color:var(--gold);}
+.sb-expired{background:rgba(192,57,43,.1);color:var(--red);}
+.sb-paid{background:rgba(41,128,185,.1);color:var(--blue);}
+/* chart placeholder */
+.chart-area{height:160px;background:linear-gradient(135deg,var(--fog),var(--sand));border-radius:12px;display:flex;align-items:flex-end;padding:16px;gap:4px;overflow:hidden;}
+.bar{background:var(--terra);border-radius:4px 4px 0 0;flex:1;opacity:.7;transition:opacity .2s;}
+.bar:hover{opacity:1;}
+.bar.green-bar{background:var(--green);}
+.bar.blue-bar{background:var(--blue);}
+.chart-labels{display:flex;gap:4px;margin-top:6px;}
+.chart-label{flex:1;font-size:.6rem;color:var(--bark);opacity:.5;text-align:center;}
+/* ── LANDLORD PORTAL ── */
+.landlord-portal{padding:88px 52px 70px;}
+.portal-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:52px;align-items:start;}
+.pinfo h2{font-family:'Playfair Display',serif;font-size:2.1rem;font-weight:900;line-height:1.1;letter-spacing:-.8px;color:var(--bark);margin-bottom:14px;}
+.pinfo h2 em{font-style:italic;color:var(--terra);}
+.pinfo>p{font-size:.88rem;line-height:1.78;color:var(--bark);opacity:.62;margin-bottom:24px;}
+.psteps{display:flex;flex-direction:column;gap:14px;}
+.pstep{display:flex;gap:14px;align-items:flex-start;}
+.psn{width:34px;height:34px;border-radius:50%;background:rgba(201,106,58,.12);color:var(--terra);font-weight:700;font-size:.84rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.pst{font-weight:600;font-size:.86rem;color:var(--bark);margin-bottom:2px;}
+.psd{font-size:.76rem;color:var(--bark);opacity:.55;line-height:1.6;}
+.pform{background:white;border-radius:22px;padding:34px 30px;box-shadow:0 4px 24px rgba(61,43,31,.08);}
+.pform h3{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:900;color:var(--bark);margin-bottom:5px;}
+.pform>p{font-size:.8rem;opacity:.54;margin-bottom:20px;line-height:1.6;}
+.fg{margin-bottom:13px;}
+.fl{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--bark);display:block;margin-bottom:4px;}
+.fi{width:100%;padding:10px 13px;border-radius:10px;border:1.5px solid rgba(61,43,31,.14);font-family:'DM Sans',sans-serif;font-size:.85rem;color:var(--bark);background:var(--cream);outline:none;transition:border-color .2s;}
+.fi:focus{border-color:var(--terra);}
+.frow2{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+/* PHOTO UPLOAD — FIXED */
+.photo-upload-area{border:2px dashed rgba(201,106,58,.4);border-radius:14px;background:rgba(201,106,58,.03);transition:all .25s;overflow:hidden;}
+.photo-upload-area.drag-over{border-color:var(--terra);background:rgba(201,106,58,.08);}
+.photo-drop-zone{padding:28px 18px;text-align:center;cursor:pointer;position:relative;}
+.photo-drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:2;}
+.puz-icon{font-size:1.8rem;margin-bottom:7px;}
+.puz-text{font-size:.79rem;color:var(--bark);opacity:.6;line-height:1.6;}
+.puz-text strong{color:var(--terra);opacity:1;}
+.photo-preview-grid{display:flex;gap:8px;flex-wrap:wrap;padding:0 14px 14px;}
+.photo-thumb{width:72px;height:62px;border-radius:9px;overflow:hidden;position:relative;border:2px solid var(--fog);flex-shrink:0;}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.photo-thumb .del-btn{position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,.6);color:white;font-size:.52rem;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:3;}
+.photo-count{font-size:.68rem;color:var(--terra);text-align:center;padding:4px 14px 10px;font-weight:500;}
+.smbtn{width:100%;padding:13px;background:var(--terra);color:white;border:none;border-radius:11px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;margin-top:6px;}
+.smbtn:hover{background:var(--bark);}
+.success-msg{display:none;background:rgba(92,110,80,.1);border:1px solid rgba(92,110,80,.3);color:var(--moss);border-radius:10px;padding:11px 14px;font-size:.8rem;text-align:center;margin-top:10px;font-weight:500;}
+/* ── PRICING PAGE ── */
+.pricing-sec{padding:88px 52px;}
+.ptabs{display:flex;gap:7px;margin-bottom:40px;flex-wrap:wrap;}
+.ptab{padding:8px 16px;border-radius:20px;border:1.5px solid rgba(61,43,31,.15);font-size:.79rem;font-weight:500;cursor:pointer;background:transparent;color:var(--bark);font-family:'DM Sans',sans-serif;transition:all .2s;}
+.ptab.active{background:var(--bark);color:var(--cream);border-color:var(--bark);}
+.ptab:hover:not(.active){border-color:var(--terra);color:var(--terra);}
+.ppanel{display:none;}.ppanel.active{display:block;}
+.plans-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;margin-bottom:40px;}
+.plan-card{background:white;border-radius:16px;padding:24px 20px;border:2px solid transparent;transition:all .3s;position:relative;overflow:hidden;}
+.plan-card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(61,43,31,.1);}
+.plan-card.pop{border-color:var(--terra);}
+.plan-card.pop::before{content:'Popular';position:absolute;top:0;right:0;background:var(--terra);color:white;font-size:.58rem;font-weight:600;padding:4px 11px;border-radius:0 14px 0 10px;}
+.plan-card.dark{background:var(--bark);color:var(--cream);}
+.plan-card.dark .plan-name{color:var(--cream);}
+.plan-card.dark .plan-price{color:var(--clay);}
+.plan-card.dark .plan-desc{color:rgba(250,247,242,.5);}
+.plan-card.dark .plan-feature{color:rgba(250,247,242,.7);border-color:rgba(200,168,130,.15);}
+.plan-card.dark .plan-div{background:rgba(200,168,130,.2);}
+.plan-icon{font-size:1.6rem;margin-bottom:11px;}
+.plan-name{font-family:'Playfair Display',serif;font-size:.97rem;font-weight:700;color:var(--bark);margin-bottom:3px;}
+.plan-price{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;color:var(--terra);line-height:1;margin-bottom:2px;}
+.plan-price sub{font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:400;color:var(--bark);opacity:.5;vertical-align:baseline;}
+.plan-desc{font-size:.72rem;color:var(--bark);opacity:.55;margin-bottom:14px;line-height:1.5;}
+.plan-div{height:1px;background:var(--fog);margin-bottom:12px;}
+.plan-features{display:flex;flex-direction:column;gap:7px;margin-bottom:16px;}
+.plan-feature{font-size:.72rem;color:var(--bark);display:flex;align-items:flex-start;gap:6px;padding-bottom:7px;border-bottom:1px solid var(--fog);}
+.plan-feature:last-child{border:none;padding-bottom:0;}
+.pfc{color:var(--moss);font-size:.78rem;flex-shrink:0;}
+.plan-cta{width:100%;padding:10px;border-radius:10px;font-size:.78rem;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .2s;}
+.pcta-p{background:var(--terra);color:white;}.pcta-p:hover{background:var(--bark);}
+.pcta-o{background:transparent;border:1.5px solid rgba(61,43,31,.2);color:var(--bark);}.pcta-o:hover{border-color:var(--terra);color:var(--terra);}
+.pcta-d{background:rgba(201,106,58,.2);color:var(--clay);}.pcta-d:hover{background:var(--terra);color:white;}
+.ptable{width:100%;border-collapse:collapse;background:white;border-radius:13px;overflow:hidden;box-shadow:0 2px 12px rgba(61,43,31,.05);}
+.ptable th{background:var(--bark);color:var(--cream);padding:12px 15px;text-align:left;font-size:.73rem;font-weight:600;}
+.ptable td{padding:11px 15px;font-size:.78rem;color:var(--bark);border-bottom:1px solid var(--fog);}
+.ptable tr:last-child td{border-bottom:none;}
+.ptable tr:hover td{background:rgba(245,239,228,.4);}
+.ph{font-family:'Playfair Display',serif;font-weight:700;color:var(--terra);font-size:.88rem;}
+.tbadge{display:inline-block;padding:2px 8px;border-radius:8px;font-size:.61rem;font-weight:600;}
+.tb-l{background:rgba(201,106,58,.12);color:var(--terra);}
+.tb-t{background:rgba(92,110,80,.12);color:var(--moss);}
+.tb-p{background:rgba(61,43,31,.08);color:var(--bark);}
+.pnote{font-size:.73rem;color:var(--bark);opacity:.5;margin-top:12px;line-height:1.6;}
+.data-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:8px;}
+.dcrd{background:white;border-radius:14px;padding:20px 18px;border:1.5px solid var(--fog);transition:all .2s;}
+.dcrd:hover{border-color:var(--clay);transform:translateY(-3px);}
+.dcrd-icon{font-size:1.4rem;margin-bottom:10px;}
+.dcrd-title{font-family:'Playfair Display',serif;font-size:.93rem;font-weight:700;color:var(--bark);margin-bottom:4px;}
+.dcrd-price{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:var(--terra);margin-bottom:6px;}
+.dcrd-desc{font-size:.73rem;color:var(--bark);opacity:.55;line-height:1.6;}
+/* ── ADMIN DASHBOARD ── */
+.admin-dash{padding:88px 52px 70px;background:var(--dark);min-height:100vh;}
+.admin-dash .st{color:#f1f1f1;}
+.admin-dash .sl{color:#C96A3A;}
+.admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;}
+.admin-title{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;color:#f1f1f1;}
+.admin-badge{background:rgba(142,68,173,.2);color:#d88cff;padding:6px 16px;border-radius:20px;font-size:.75rem;font-weight:600;letter-spacing:.5px;}
+.admin-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px;}
+.adstat{background:rgba(255,255,255,.05);border-radius:14px;padding:18px 16px;border:1px solid rgba(255,255,255,.07);}
+.adstat-num{font-family:'Playfair Display',serif;font-size:1.65rem;font-weight:900;color:#f1f1f1;}
+.adstat-lbl{font-size:.68rem;color:rgba(255,255,255,.45);margin-top:3px;}
+.adstat-ch{font-size:.62rem;margin-top:5px;}
+.adstat-ch.up{color:#2ecc71;}
+.adstat-ch.down{color:#e74c3c;}
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
+.admin-card{background:rgba(255,255,255,.05);border-radius:16px;padding:22px 20px;border:1px solid rgba(255,255,255,.07);}
+.admin-card h3{font-size:.85rem;font-weight:600;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px;}
+.admin-table{width:100%;border-collapse:collapse;}
+.admin-table th{font-size:.68rem;font-weight:600;text-transform:uppercase;color:rgba(255,255,255,.35);padding:8px 10px;text-align:left;border-bottom:1px solid rgba(255,255,255,.07);}
+.admin-table td{padding:10px 10px;font-size:.78rem;color:rgba(255,255,255,.7);border-bottom:1px solid rgba(255,255,255,.05);}
+.admin-table tr:last-child td{border:none;}
+.admin-table tr:hover td{background:rgba(255,255,255,.03);}
+.astatus{padding:2px 8px;border-radius:8px;font-size:.62rem;font-weight:600;}
+.as-active{background:rgba(46,204,113,.15);color:#2ecc71;}
+.as-pending{background:rgba(241,196,15,.15);color:#f1c40f;}
+.as-sus{background:rgba(231,76,60,.15);color:#e74c3c;}
+.as-paid{background:rgba(41,128,185,.15);color:#5dade2;}
+.revenue-bars{display:flex;align-items:flex-end;gap:5px;height:120px;margin-bottom:8px;}
+.rev-bar{flex:1;background:rgba(201,106,58,.5);border-radius:3px 3px 0 0;position:relative;cursor:pointer;transition:background .2s;}
+.rev-bar:hover{background:rgba(201,106,58,.8);}
+.rev-bar::after{content:attr(data-val);position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:.6rem;color:rgba(255,255,255,.5);white-space:nowrap;}
+.rev-labels{display:flex;gap:5px;}
+.rev-label{flex:1;font-size:.58rem;color:rgba(255,255,255,.3);text-align:center;}
+.activity-feed{display:flex;flex-direction:column;gap:10px;}
+.af-item{display:flex;align-items:flex-start;gap:10px;padding:10px;background:rgba(255,255,255,.03);border-radius:10px;}
+.af-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.af-dot.green{background:#2ecc71;}
+.af-dot.orange{background:var(--terra);}
+.af-dot.blue{background:#5dade2;}
+.af-dot.yellow{background:#f1c40f;}
+.af-text{font-size:.77rem;color:rgba(255,255,255,.6);line-height:1.5;}
+.af-time{font-size:.65rem;color:rgba(255,255,255,.3);margin-top:2px;}
+/* ── FOOTER ── */
+footer{padding:34px 52px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(200,168,130,.2);}
+.footer-logo{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:var(--bark);}
+.footer-logo span{color:var(--terra);}
+.footer-links{display:flex;gap:18px;}
+.footer-links a{font-size:.74rem;color:var(--bark);opacity:.4;text-decoration:none;}
+.footer-links a:hover{opacity:1;}
+.footer-copy{font-size:.68rem;color:var(--bark);opacity:.27;}
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+.hero-left>*{animation:fadeUp .7s ease both;}
+.eyebrow{animation-delay:.1s}.hero-title{animation-delay:.2s}.hero-sub{animation-delay:.3s}.hero-actions{animation-delay:.4s}.hero-stats{animation-delay:.5s}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.pay-processing{animation:pulse 1s ease infinite;}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     AUTH MODAL
+════════════════════════════════════════ -->
+<div class="modal-overlay hidden" id="authModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('authModal')">×</button>
+    <h2 id="authTitle">Welcome Back</h2>
+    <p id="authSubtitle">Sign in to access full pricing, contact landlords, and save listings.</p>
+    <div class="role-select" id="roleSelect" style="grid-template-columns:1fr 1fr;">
+      <div class="role-btn active" onclick="selectRole('tenant',this)"><span class="role-icon">🏠</span><span class="role-name">Tenant</span></div>
+      <div class="role-btn" onclick="selectRole('landlord',this)"><span class="role-icon">🔑</span><span class="role-name">Landlord</span></div>
+    </div>
+    <div id="loginForm">
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="loginEmail" placeholder="you@example.com"></div>
+      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="loginPass" placeholder="••••••••"></div>
+      <div id="adminPassGroup" class="form-group hidden"><label class="form-label">Admin Secret Key</label><input class="form-input" type="password" id="adminPass" placeholder="Enter admin key"></div>
+      <div id="loginError" style="display:none;color:#C0392B;font-size:.78rem;margin-bottom:8px;padding:8px 12px;background:rgba(192,57,43,.08);border-radius:8px;">❌ Incorrect admin key. Access denied.</div>
+      <button class="btn btn-terra" style="width:100%;margin-top:4px;" onclick="doLogin()">Sign In</button>
+      <div class="auth-switch">Don't have an account? <span onclick="showRegister()">Create one</span></div>
+    </div>
+    <div id="registerForm" class="hidden">
+      <div class="form-row-2">
+        <div class="form-group"><label class="form-label">First Name</label><input class="form-input" type="text" placeholder="Amina"></div>
+        <div class="form-group"><label class="form-label">Last Name</label><input class="form-input" type="text" placeholder="Wanjiku"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="you@example.com"></div>
+      <div class="form-group"><label class="form-label">Phone (M-PESA)</label><input class="form-input" type="tel" placeholder="0712 345 678"></div>
+      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" placeholder="••••••••"></div>
+      <button class="btn btn-terra" style="width:100%;margin-top:4px;" onclick="doRegister()">Create Account</button>
+      <div class="auth-switch">Already have an account? <span onclick="showLogin()">Sign in</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     PAYWALL MODAL
+════════════════════════════════════════ -->
+<div class="modal-overlay hidden" id="payModal">
+  <div class="modal" style="max-width:460px;">
+    <button class="modal-close" onclick="closeModal('payModal')">×</button>
+    <h2 id="payTitle">Unlock Full Details</h2>
+    <p id="paySubtitle">One-time payment to view full pricing, contact info, and book a tour for this listing.</p>
+    <div class="pay-summary">
+      <strong id="payPropName">Westlands Heights, Unit 3A</strong><br>
+      📍 <span id="payPropLoc">Westlands · Nairobi</span><br>
+      💰 Access fee: <strong id="payFeeAmt">KES 300</strong> — view contact + book tour
+    </div>
+    <p style="font-size:.8rem;font-weight:600;color:var(--bark);margin-bottom:10px;">Choose Payment Method:</p>
+    <div class="paywall-grid">
+      <div class="pay-opt active" onclick="selectPay('mpesa',this)"><div class="pay-icon">📱</div><div class="pay-name">M-PESA</div><div class="pay-detail">Lipa Na M-PESA</div></div>
+      <div class="pay-opt" onclick="selectPay('card',this)"><div class="pay-icon">💳</div><div class="pay-name">Card</div><div class="pay-detail">Visa / Mastercard</div></div>
+    </div>
+    <div id="mpesa-section" class="mpesa-input">
+      <div class="form-group"><label class="form-label">M-PESA Phone Number</label><input class="form-input" type="tel" id="mpesaNum" placeholder="0712 345 678" value="0712 345 678"></div>
+      <p style="font-size:.72rem;opacity:.5;margin-top:-8px;margin-bottom:12px;">An STK push will be sent to your phone to confirm payment.</p>
+    </div>
+    <div id="card-section" class="hidden">
+      <div class="form-group"><label class="form-label">Card Number</label><input class="form-input" type="text" placeholder="4242 4242 4242 4242"></div>
+      <div class="form-row-2">
+        <div class="form-group"><label class="form-label">Expiry</label><input class="form-input" type="text" placeholder="MM/YY"></div>
+        <div class="form-group"><label class="form-label">CVC</label><input class="form-input" type="text" placeholder="123"></div>
+      </div>
+    </div>
+    <button class="btn btn-green" style="width:100%;" id="payBtn" onclick="processPayment()">✓ Pay & Unlock Details</button>
+    <p style="font-size:.68rem;opacity:.4;text-align:center;margin-top:10px;">🔒 Secured by Stripe & Safaricom M-PESA</p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     CONTACT REVEALED MODAL
+════════════════════════════════════════ -->
+<div class="modal-overlay hidden" id="contactModal">
+  <div class="modal" style="max-width:400px;">
+    <button class="modal-close" onclick="closeModal('contactModal')">×</button>
+    <h2>🎉 Contact Unlocked!</h2>
+    <p>You now have full access to this listing's details and landlord contact.</p>
+    <div style="background:var(--fog);border-radius:14px;padding:18px;margin:16px 0;">
+      <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;margin-bottom:8px;" id="ctPropName">Westlands Heights, Unit 3A</div>
+      <div style="font-size:.82rem;margin-bottom:6px;">💰 <strong style="color:var(--terra);" id="ctFullPrice">KES 45,000 / month</strong></div>
+      <div style="font-size:.78rem;opacity:.7;margin-bottom:4px;">🏦 Deposit: <span id="ctDeposit">KES 90,000 (2 months)</span></div>
+      <div style="font-size:.78rem;opacity:.7;margin-bottom:14px;">📋 Service Charge: <span id="ctService">KES 2,500 / month</span></div>
+      <div style="border-top:1px solid rgba(61,43,31,.15);padding-top:12px;">
+        <div style="font-size:.78rem;font-weight:600;margin-bottom:8px;">Landlord Contact:</div>
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          <a href="https://wa.me/254712345678" style="display:flex;align-items:center;gap:8px;background:#25D366;color:white;padding:10px 14px;border-radius:10px;text-decoration:none;font-size:.82rem;font-weight:600;"><span>📱</span> WhatsApp: 0712 345 678</a>
+          <a href="tel:+254712345678" style="display:flex;align-items:center;gap:8px;background:var(--bark);color:white;padding:10px 14px;border-radius:10px;text-decoration:none;font-size:.82rem;font-weight:600;"><span>📞</span> Call: 0712 345 678</a>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-terra" style="width:100%;" onclick="closeModal('contactModal')">Book a Tour</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     NAV
+════════════════════════════════════════ -->
+<nav>
+  <div class="logo">Nest<span>Drift</span><div class="logo-dot"></div></div>
+  <div class="nav-links" id="navLinks">
+    <span class="nav-tab active" onclick="showPage('home',this)">🏠 Browse</span>
+    <span class="nav-tab" onclick="showPage('pricing',this)">💰 Pricing</span>
+    <span class="nav-tab hidden" id="navTenant" onclick="showPage('tenant-dash',this)">📊 My Dashboard</span>
+    <span class="nav-tab hidden" id="navLandlord" onclick="showPage('landlord-portal',this)">🔑 My Listings</span>
+    <span class="nav-tab hidden" id="navAdmin" onclick="showPage('admin-dash',this)">⚙️ Admin Panel</span>
+  </div>
+  <div class="nav-user" id="navUser">
+    <button class="btn btn-outline" style="font-size:.8rem;padding:8px 18px;" onclick="openModal('authModal')">Sign In</button>
+    <button class="btn btn-terra" style="font-size:.8rem;padding:8px 18px;" onclick="openModal('authModal')">Join Free</button>
+  </div>
+  <div class="nav-user hidden" id="navLoggedIn">
+    <span class="nav-role-badge" id="navRoleBadge"></span>
+    <div class="nav-avatar" id="navAvatar" onclick="doLogout()">?</div>
+  </div>
+</nav>
+
+<!-- ════════════════════════════════════════
+     HOME PAGE
+════════════════════════════════════════ -->
+<div id="page-home" class="page active">
+  <section class="hero">
+    <div class="hero-left">
+      <div class="eyebrow">Rental Matchmaker · Kenya</div>
+      <h1 class="hero-title">Find where<br>you <em>truly</em><br>belong.</h1>
+      <p class="hero-sub">Discover premium apartments across all 47 Kenyan counties. Starting prices shown publicly — sign in to unlock full details, contacts and book tours.</p>
+      <div class="hero-actions">
+        <button class="btn btn-bark" onclick="document.getElementById('listings').scrollIntoView({behavior:'smooth'})">Browse Listings →</button>
+        <button class="btn btn-outline" onclick="openModal('authModal')">Sign In / Join Free</button>
+      </div>
+      <div class="hero-stats">
+        <div><div class="snum">5K+</div><div class="slbl">Kenya listings</div></div>
+        <div><div class="snum">47</div><div class="slbl">Counties covered</div></div>
+        <div><div class="snum">KES</div><div class="slbl">All prices in KES</div></div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-bg"></div><div class="deco"></div>
+      <div class="app-mock">
+        <div class="mock-notch"></div>
+        <div class="mock-hd"><span class="mock-htitle">Your Matches</span><span class="mock-pill">✦ 18 new</span></div>
+        <div class="mock-card">
+          <div class="mock-img">🏢</div>
+          <div class="mock-ci">
+            <div class="mock-cn">Westlands Heights, 3A</div>
+            <div class="mock-cs">Westlands · Nairobi</div>
+            <div class="mock-cp">from KES 43,000</div>
+            <div class="mock-price-teaser">🔒 Sign in for exact price + contact</div>
+            <div class="mock-tags"><span class="mock-tag">Parking</span><span class="mock-tag">Borehole</span></div>
+          </div>
+        </div>
+        <div class="mock-btns"><button class="mock-btn pass">✕ Pass</button><button class="mock-btn match">♥ Match</button></div>
+      </div>
+      <div class="badge-fl top">⚡<div><div>Perfect Match</div><div class="bsub">100% wishlist fit</div></div></div>
+      <div class="badge-fl bot">🔔<div><div>Price alert!</div><div class="bsub">Login to view</div></div></div>
+    </div>
+  </section>
+
+  <!-- PRICE TRANSPARENCY BANNER -->
+  <div style="background:var(--bark);padding:18px 52px;display:flex;align-items:center;justify-content:space-between;">
+    <div style="color:rgba(250,247,242,.8);font-size:.82rem;display:flex;align-items:center;gap:12px;">
+      <span style="font-size:1.1rem;">ℹ️</span>
+      <span>NestDrift shows <strong style="color:var(--clay);">starting prices publicly</strong> — like Rightmove & Zillow. <strong style="color:var(--clay);">Sign in free</strong> to see exact rent, deposit, service charges and landlord contacts.</span>
+    </div>
+    <button class="btn btn-terra" style="font-size:.78rem;padding:8px 18px;flex-shrink:0;" onclick="openModal('authModal')">Sign In Free →</button>
+  </div>
+
+  <!-- LISTINGS -->
+  <section class="listings-sec" id="listings">
+    <div class="sl">Browse Apartments</div>
+    <h2 class="st">Apartments across <em>Kenya</em></h2>
+    <div class="filters-bar">
+      <select class="fsel"><option>All Regions</option><option>Nairobi</option><option>Mombasa</option><option>Kisumu</option><option>Nakuru</option><option>Eldoret</option><option>Thika</option></select>
+      <select class="fsel"><option>All Areas</option><option>Westlands</option><option>Kilimani</option><option>Lavington</option><option>Karen</option><option>Nyali</option><option>Milimani</option></select>
+      <select class="fsel"><option>Any Budget (KES)</option><option>Under 20,000</option><option>20K–40K</option><option>40K–80K</option><option>80K–150K</option><option>150K+</option></select>
+      <select class="fsel"><option>Any Bedrooms</option><option>Studio</option><option>1 Bed</option><option>2 Beds</option><option>3 Beds</option><option>4+ Beds</option></select>
+      <button class="fbtn">Search</button>
+    </div>
+    <div class="listings-grid" id="listingsGrid">
+      <!-- Cards injected by JS -->
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features-sec">
+    <div class="sl">What We Offer</div>
+    <h2 class="st">Every tool to rent <em>smarter</em> in Kenya.</h2>
+    <div class="features-grid">
+      <div class="fcard"><div class="fc-num">01</div><div class="fc-icon">🔒</div><div class="fc-title-t">Transparent Pricing</div><p class="fc-desc">Starting prices shown publicly — like Rightmove. Sign in free to unlock exact rent, deposit & service charge.</p></div>
+      <div class="fcard"><div class="fc-num">02</div><div class="fc-icon">🎯</div><div class="fc-title-t">Rental Matchmaker</div><p class="fc-desc">5-minute quiz. Instant matches across all 47 Kenyan counties based on your real preferences.</p></div>
+      <div class="fcard"><div class="fc-num">03</div><div class="fc-icon">📱</div><div class="fc-title-t">M-PESA Payments</div><p class="fc-desc">Pay access fees with M-PESA STK push. No card needed. Instant confirmation, instant access.</p></div>
+      <div class="fcard"><div class="fc-num">04</div><div class="fc-icon">📸</div><div class="fc-title-t">Verified Photo Galleries</div><p class="fc-desc">Landlord-uploaded real photos with swipeable galleries. No stock images, no surprises on move-in day.</p></div>
+      <div class="fcard"><div class="fc-num">05</div><div class="fc-icon">📊</div><div class="fc-title-t">Role-Based Dashboards</div><p class="fc-desc">Tenants see saved listings & applications. Landlords track enquiries & revenue. Admin monitors the platform.</p></div>
+      <div class="fcard"><div class="fc-num">06</div><div class="fc-icon">🔔</div><div class="fc-title-t">Real-Time Alerts</div><p class="fc-desc">KES price drops on your saved listings delivered instantly — never miss a move again.</p></div>
+    </div>
+  </section>
+
+  <section class="match-sec">
+    <div class="mc perfect"><div class="mc-tag">✦ Perfect Match</div><h3 class="mc-h">Every box checked.</h3><p class="mc-p">Right size, right price in KES, right location in Kenya. Zero compromises.</p><div class="mc-deco"></div></div>
+    <div class="mc flex"><div class="mc-tag">◈ Flex Match</div><h3 class="mc-h">Hidden gems.</h3><p class="mc-p">Based on local insights from Kenyan renters — often people's all-time favourites.</p><div class="mc-deco"></div></div>
+  </section>
+
+  <div class="cta-strip"><div class="cta-bg"></div>
+    <div class="cta-text"><h2 class="cta-h">Your next home is<br><em>already waiting.</em></h2><p class="cta-p">Join free. Start matching across Kenya today.</p></div>
+    <div class="cta-btns">
+      <a href="#" class="app-btn"><span style="font-size:1rem"></span><div><span class="app-btn-label">Download on the</span><span class="app-btn-name">App Store</span></div></a>
+      <a href="#" class="app-btn"><span style="font-size:1rem">▶</span><div><span class="app-btn-label">Get it on</span><span class="app-btn-name">Google Play</span></div></a>
+    </div>
+  </div>
+</div><!-- /home -->
+
+<!-- ════════════════════════════════════════
+     TENANT DASHBOARD
+════════════════════════════════════════ -->
+<div id="page-tenant-dash" class="page">
+<div class="dashboard">
+  <div class="sl">My Account</div>
+  <h2 class="st">Tenant <em>Dashboard</em></h2>
+  <div class="dash-grid">
+    <div class="dash-sidebar">
+      <div class="dash-avatar">🏠</div>
+      <div class="dash-username" id="tenantName">Amina Wanjiku</div>
+      <div class="dash-role">Tenant · Nairobi</div>
+      <div class="sidebar-nav">
+        <button class="snav-item active" onclick="showDashPanel('t-overview',this)"><span class="si-icon">📊</span>Overview</button>
+        <button class="snav-item" onclick="showDashPanel('t-saved',this)"><span class="si-icon">❤️</span>Saved Listings</button>
+        <button class="snav-item" onclick="showDashPanel('t-applications',this)"><span class="si-icon">📋</span>Applications</button>
+        <button class="snav-item" onclick="showDashPanel('t-payments',this)"><span class="si-icon">💰</span>Payments</button>
+        <button class="snav-item" onclick="showDashPanel('t-alerts',this)"><span class="si-icon">🔔</span>Price Alerts</button>
+        <button class="snav-item" onclick="showDashPanel('t-profile',this)"><span class="si-icon">👤</span>Profile & Verification</button>
+      </div>
+    </div>
+    <div class="dash-main">
+      <!-- OVERVIEW -->
+      <div id="t-overview" class="dash-panel active">
+        <div class="stats-row">
+          <div class="stat-card green"><div class="stat-num">12</div><div class="stat-label">Saved Listings</div><div class="stat-change up">↑ 3 new this week</div></div>
+          <div class="stat-card blue"><div class="stat-num">3</div><div class="stat-label">Applications Sent</div><div class="stat-change up">↑ 1 pending response</div></div>
+          <div class="stat-card"><div class="stat-num">7</div><div class="stat-label">Listings Viewed</div><div class="stat-change up">↑ Unlocked via M-PESA</div></div>
+          <div class="stat-card purple"><div class="stat-num">2</div><div class="stat-label">Tours Booked</div><div class="stat-change">Next: Fri 10 AM</div></div>
+        </div>
+        <div class="dash-card">
+          <h3>Recent Activity</h3>
+          <table class="data-table">
+            <thead><tr><th>Property</th><th>Location</th><th>Action</th><th>Date</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Westlands Heights 3A</td><td>Westlands, NBI</td><td>Contact Unlocked</td><td>Today 10:23</td><td><span class="status-badge sb-paid">KES 300 paid</span></td></tr>
+              <tr><td>Kilimani Garden Suites</td><td>Kilimani, NBI</td><td>Saved</td><td>Yesterday</td><td><span class="status-badge sb-active">Saved</span></td></tr>
+              <tr><td>Nyali Ocean Breeze</td><td>Nyali, Mombasa</td><td>Tour Booked</td><td>Apr 14</td><td><span class="status-badge sb-pending">Pending</span></td></tr>
+              <tr><td>Milimani Lake View</td><td>Milimani, Kisumu</td><td>Application Sent</td><td>Apr 12</td><td><span class="status-badge sb-active">Under Review</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="dash-card">
+          <h3>My Verified Status</h3>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <div style="background:rgba(39,174,96,.1);border:1px solid rgba(39,174,96,.3);border-radius:12px;padding:12px 16px;font-size:.8rem;color:var(--moss);font-weight:600;">✅ ID Verified</div>
+            <div style="background:rgba(41,128,185,.1);border:1px solid rgba(41,128,185,.3);border-radius:12px;padding:12px 16px;font-size:.8rem;color:var(--blue);font-weight:600;">✅ Phone Verified</div>
+            <div style="background:rgba(212,168,83,.1);border:1px solid rgba(212,168,83,.3);border-radius:12px;padding:12px 16px;font-size:.8rem;color:var(--gold);font-weight:600;">⏳ CRB Check — KES 1,500</div>
+            <div style="background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.2);border-radius:12px;padding:12px 16px;font-size:.8rem;color:var(--red);font-weight:600;">🔒 Renter Badge — KES 500</div>
+          </div>
+        </div>
+      </div>
+      <!-- SAVED -->
+      <div id="t-saved" class="dash-panel">
+        <div class="dash-card">
+          <h3>❤️ Saved Listings (12)</h3>
+          <table class="data-table">
+            <thead><tr><th>Property</th><th>Location</th><th>Price</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td>Westlands Heights 3A</td><td>Westlands, NBI</td><td>KES 45,000/mo</td><td><span class="status-badge sb-active">Available</span></td><td><button class="btn btn-terra" style="font-size:.7rem;padding:5px 12px;">View</button></td></tr>
+              <tr><td>Kilimani Garden Suites</td><td>Kilimani, NBI</td><td>KES 22,000/mo</td><td><span class="status-badge sb-active">Available</span></td><td><button class="btn btn-terra" style="font-size:.7rem;padding:5px 12px;">View</button></td></tr>
+              <tr><td>Karen Valley Homes</td><td>Karen, NBI</td><td>KES 95,000/mo</td><td><span class="status-badge sb-pending">Price Dropped ↓</span></td><td><button class="btn btn-terra" style="font-size:.7rem;padding:5px 12px;">View</button></td></tr>
+              <tr><td>Nyali Ocean Breeze</td><td>Nyali, Mombasa</td><td>KES 85,000/mo</td><td><span class="status-badge sb-active">Available</span></td><td><button class="btn btn-terra" style="font-size:.7rem;padding:5px 12px;">View</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- APPLICATIONS -->
+      <div id="t-applications" class="dash-panel">
+        <div class="dash-card">
+          <h3>📋 My Applications</h3>
+          <table class="data-table">
+            <thead><tr><th>Property</th><th>Applied</th><th>Rent (KES)</th><th>Status</th><th>Landlord Response</th></tr></thead>
+            <tbody>
+              <tr><td>Milimani Lake View</td><td>Apr 12, 2026</td><td>28,000</td><td><span class="status-badge sb-pending">Under Review</span></td><td>Awaiting response</td></tr>
+              <tr><td>Nakuru Central Apts</td><td>Apr 8, 2026</td><td>15,000</td><td><span class="status-badge sb-expired">Declined</span></td><td>Unit taken</td></tr>
+              <tr><td>Parklands Executive</td><td>Apr 3, 2026</td><td>180,000</td><td><span class="status-badge sb-active">Shortlisted</span></td><td>Tour scheduled Fri</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- PAYMENTS -->
+      <div id="t-payments" class="dash-panel">
+        <div class="dash-card">
+          <h3>💰 Payment History</h3>
+          <table class="data-table">
+            <thead><tr><th>Description</th><th>Amount</th><th>Method</th><th>Date</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Contact Unlock — Westlands Heights 3A</td><td>KES 300</td><td>M-PESA</td><td>Today 10:23</td><td><span class="status-badge sb-paid">Paid</span></td></tr>
+              <tr><td>Premium Search Alerts — April</td><td>KES 299</td><td>M-PESA</td><td>Apr 1, 2026</td><td><span class="status-badge sb-paid">Paid</span></td></tr>
+              <tr><td>Contact Unlock — Nyali Ocean Breeze</td><td>KES 300</td><td>Card</td><td>Mar 28, 2026</td><td><span class="status-badge sb-paid">Paid</span></td></tr>
+              <tr><td>Universal Background Check</td><td>KES 1,500</td><td>M-PESA</td><td>Mar 20, 2026</td><td><span class="status-badge sb-paid">Paid</span></td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top:14px;padding:12px 16px;background:var(--fog);border-radius:12px;font-size:.82rem;display:flex;justify-content:space-between;align-items:center;">
+            <span>Total spent this month</span>
+            <strong style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--terra);">KES 2,399</strong>
+          </div>
+        </div>
+      </div>
+      <!-- ALERTS -->
+      <div id="t-alerts" class="dash-panel">
+        <div class="dash-card">
+          <h3>🔔 Price Alerts</h3>
+          <table class="data-table">
+            <thead><tr><th>Property</th><th>Previous Price</th><th>New Price</th><th>Change</th><th>Date</th></tr></thead>
+            <tbody>
+              <tr><td>Karen Valley Homes</td><td>KES 100,000</td><td>KES 95,000</td><td style="color:var(--green);">↓ KES 5,000</td><td>Today</td></tr>
+              <tr><td>Lavington Flats B4</td><td>KES 65,000</td><td>KES 58,000</td><td style="color:var(--green);">↓ KES 7,000</td><td>Apr 15</td></tr>
+              <tr><td>Westlands Heights 3A</td><td>KES 48,000</td><td>KES 45,000</td><td style="color:var(--green);">↓ KES 3,000</td><td>Apr 10</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- PROFILE -->
+      <div id="t-profile" class="dash-panel">
+        <div class="dash-card">
+          <h3>👤 Profile & Verification</h3>
+          <div class="form-row-2" style="margin-bottom:12px;">
+            <div class="form-group"><label class="form-label">First Name</label><input class="form-input" value="Amina"></div>
+            <div class="form-group"><label class="form-label">Last Name</label><input class="form-input" value="Wanjiku"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Email</label><input class="form-input" value="amina.wanjiku@email.com"></div>
+          <div class="form-group"><label class="form-label">M-PESA / Phone</label><input class="form-input" value="0712 345 678"></div>
+          <div class="form-group"><label class="form-label">Current County</label><input class="form-input" value="Nairobi"></div>
+          <button class="btn btn-terra" style="margin-top:6px;">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- /tenant dash -->
+
+<!-- ════════════════════════════════════════
+     LANDLORD PORTAL + DASHBOARD
+════════════════════════════════════════ -->
+<div id="page-landlord-portal" class="page">
+<div class="dashboard" style="padding-bottom:40px;">
+  <div class="sl">Landlord Portal</div>
+  <h2 class="st">Manage Your <em>Properties</em></h2>
+  <div class="dash-grid">
+    <div class="dash-sidebar">
+      <div class="dash-avatar">🔑</div>
+      <div class="dash-username" id="landlordName">James Otieno</div>
+      <div class="dash-role">Landlord · Agency Pro</div>
+      <div class="sidebar-nav">
+        <button class="snav-item active" onclick="showDashPanel('l-overview',this)"><span class="si-icon">📊</span>Overview</button>
+        <button class="snav-item" onclick="showDashPanel('l-listings',this)"><span class="si-icon">🏠</span>My Listings</button>
+        <button class="snav-item" onclick="showDashPanel('l-enquiries',this)"><span class="si-icon">📩</span>Enquiries</button>
+        <button class="snav-item" onclick="showDashPanel('l-revenue',this)"><span class="si-icon">💰</span>Revenue</button>
+        <button class="snav-item" onclick="showDashPanel('l-addlisting',this)"><span class="si-icon">➕</span>Add New Listing</button>
+        <button class="snav-item" onclick="showDashPanel('l-analytics',this)"><span class="si-icon">📈</span>Analytics</button>
+      </div>
+    </div>
+    <div class="dash-main">
+      <!-- L-OVERVIEW -->
+      <div id="l-overview" class="dash-panel active">
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-num">8</div><div class="stat-label">Active Listings</div><div class="stat-change up">↑ 2 boosted</div></div>
+          <div class="stat-card green"><div class="stat-num">34</div><div class="stat-label">Total Enquiries</div><div class="stat-change up">↑ 12 this week</div></div>
+          <div class="stat-card blue"><div class="stat-num">KES 4.2K</div><div class="stat-label">Revenue (Apr)</div><div class="stat-change up">↑ from lead fees</div></div>
+          <div class="stat-card purple"><div class="stat-num">92%</div><div class="stat-label">Occupancy Rate</div><div class="stat-change up">↑ 7/8 units let</div></div>
+        </div>
+        <div class="dash-card">
+          <h3>Top Performing Listings</h3>
+          <table class="data-table">
+            <thead><tr><th>Property</th><th>Area</th><th>Rent (KES)</th><th>Views</th><th>Enquiries</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Westlands Heights 3A</td><td>Westlands</td><td>45,000</td><td>142</td><td>18</td><td><span class="status-badge sb-active">Let</span></td></tr>
+              <tr><td>Kilimani Garden Studio</td><td>Kilimani</td><td>22,000</td><td>89</td><td>11</td><td><span class="status-badge sb-pending">Viewing</span></td></tr>
+              <tr><td>Parklands 4-Bed</td><td>Parklands</td><td>180,000</td><td>67</td><td>5</td><td><span class="status-badge sb-active">Available</span></td></tr>
+              <tr><td>Karen Valley Unit</td><td>Karen</td><td>95,000</td><td>54</td><td>8</td><td><span class="status-badge sb-active">Let</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="dash-card">
+          <h3>Monthly Views & Enquiries</h3>
+          <div class="chart-area" id="landlordChart"></div>
+          <div class="chart-labels" id="landlordChartLabels"></div>
+        </div>
+      </div>
+      <!-- L-LISTINGS -->
+      <div id="l-listings" class="dash-panel">
+        <div class="dash-card">
+          <h3>🏠 My Listings (8 active)</h3>
+          <table class="data-table">
+            <thead><tr><th>Property</th><th>Location</th><th>Rent</th><th>Plan</th><th>Expires</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Westlands Heights 3A</td><td>Westlands, NBI</td><td>KES 45,000</td><td><span class="status-badge sb-paid">Featured</span></td><td>May 10</td><td><span class="status-badge sb-active">Let</span></td></tr>
+              <tr><td>Kilimani Garden Studio</td><td>Kilimani, NBI</td><td>KES 22,000</td><td><span class="status-badge sb-active">Boosted</span></td><td>Apr 25</td><td><span class="status-badge sb-pending">Available</span></td></tr>
+              <tr><td>Parklands 4-Bed Executive</td><td>Parklands, NBI</td><td>KES 180,000</td><td><span class="status-badge sb-active">Standard</span></td><td>Apr 30</td><td><span class="status-badge sb-active">Available</span></td></tr>
+              <tr><td>Karen Valley Homes</td><td>Karen, NBI</td><td>KES 95,000</td><td><span class="status-badge sb-paid">Featured</span></td><td>May 5</td><td><span class="status-badge sb-active">Let</span></td></tr>
+            </tbody>
+          </table>
+          <button class="btn btn-terra" style="margin-top:14px;" onclick="showDashPanel('l-addlisting',document.querySelector('.snav-item'))">+ Add New Listing</button>
+        </div>
+      </div>
+      <!-- L-ENQUIRIES -->
+      <div id="l-enquiries" class="dash-panel">
+        <div class="dash-card">
+          <h3>📩 Tenant Enquiries (34)</h3>
+          <table class="data-table">
+            <thead><tr><th>Tenant</th><th>Property</th><th>Type</th><th>Date</th><th>Verified</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td>Amina Wanjiku</td><td>Westlands Hts 3A</td><td>WhatsApp tap</td><td>Today 10:23</td><td>✅ ID + CRB</td><td><button class="btn btn-outline" style="font-size:.68rem;padding:4px 10px;">Reply</button></td></tr>
+              <tr><td>Brian Kamau</td><td>Kilimani Studio</td><td>Tour booking</td><td>Today 09:14</td><td>✅ Phone</td><td><button class="btn btn-outline" style="font-size:.68rem;padding:4px 10px;">Reply</button></td></tr>
+              <tr><td>Sandra Omondi</td><td>Parklands 4-Bed</td><td>Application</td><td>Apr 16</td><td>✅ ID</td><td><button class="btn btn-terra" style="font-size:.68rem;padding:4px 10px;">Review</button></td></tr>
+              <tr><td>Michael Njoroge</td><td>Karen Valley</td><td>WhatsApp tap</td><td>Apr 15</td><td>⏳ Unverified</td><td><button class="btn btn-outline" style="font-size:.68rem;padding:4px 10px;">Reply</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- L-REVENUE -->
+      <div id="l-revenue" class="dash-panel">
+        <div class="stats-row" style="grid-template-columns:repeat(3,1fr);">
+          <div class="stat-card green"><div class="stat-num">KES 4,200</div><div class="stat-label">Lead Fees Earned (Apr)</div></div>
+          <div class="stat-card blue"><div class="stat-num">KES 8,000</div><div class="stat-label">Listing Plans Paid</div></div>
+          <div class="stat-card gold"><div class="stat-num">KES 12,200</div><div class="stat-label">Total Platform Spend</div></div>
+        </div>
+        <div class="dash-card">
+          <h3>💰 Payment History</h3>
+          <table class="data-table">
+            <thead><tr><th>Description</th><th>Amount</th><th>Method</th><th>Date</th></tr></thead>
+            <tbody>
+              <tr><td>Agency Pro Plan — May</td><td>KES 7,500</td><td>M-PESA</td><td>May 1, 2026</td></tr>
+              <tr><td>Featured Banner — Karen Valley</td><td>KES 5,000</td><td>Card</td><td>Apr 20</td></tr>
+              <tr><td>Boost — Kilimani Studio</td><td>KES 1,200</td><td>M-PESA</td><td>Apr 18</td></tr>
+              <tr><td>Pay-per-Listing × 2</td><td>KES 1,000</td><td>M-PESA</td><td>Apr 10</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- L-ADD LISTING -->
+      <div id="l-addlisting" class="dash-panel">
+        <div class="dash-card" style="padding:0;overflow:hidden;">
+          <div style="padding:22px 22px 18px;border-bottom:1px solid var(--fog);">
+            <h3 style="margin-bottom:0;">➕ Add New Listing</h3>
+            <p style="font-size:.78rem;opacity:.55;margin-top:4px;">Fill in all details and upload at least 3 photos for your listing to go live.</p>
+          </div>
+          <div style="padding:22px;">
+            <div class="fg"><label class="fl">Property Name</label><input class="fi" type="text" placeholder="e.g. Westlands Heights, Unit 3A"></div>
+            <div class="frow2">
+              <div class="fg"><label class="fl">County / Region</label><select class="fi"><option value="">Select County</option><option>Nairobi</option><option>Mombasa</option><option>Kisumu</option><option>Nakuru</option><option>Uasin Gishu</option><option>Kiambu</option><option>Nyeri</option><option>Machakos</option><option>Kilifi</option><option>Meru</option><option>Kajiado</option><option>Murang'a</option></select></div>
+              <div class="fg"><label class="fl">Area / Estate</label><input class="fi" type="text" placeholder="e.g. Westlands, Nyali"></div>
+            </div>
+            <div class="fg"><label class="fl">Full Address / Landmark</label><input class="fi" type="text" placeholder="e.g. Off Waiyaki Way, near Sarit Centre"></div>
+            <div class="frow2">
+              <div class="fg"><label class="fl">Monthly Rent (KES)</label><input class="fi" type="number" placeholder="e.g. 45000" id="rentInput"></div>
+              <div class="fg"><label class="fl">Deposit (KES)</label><input class="fi" type="number" placeholder="e.g. 90000"></div>
+            </div>
+            <div class="frow2">
+              <div class="fg"><label class="fl">Service Charge (KES)</label><input class="fi" type="number" placeholder="e.g. 2500"></div>
+              <div class="fg"><label class="fl">Bedrooms</label><select class="fi"><option>Studio</option><option>1 Bedroom</option><option>2 Bedrooms</option><option>3 Bedrooms</option><option>4+ Bedrooms</option></select></div>
+            </div>
+            <div class="frow2">
+              <div class="fg"><label class="fl">Bathrooms</label><select class="fi"><option>1 Bath</option><option>2 Baths</option><option>3 Baths</option></select></div>
+              <div class="fg"><label class="fl">Size (m²)</label><input class="fi" type="number" placeholder="e.g. 85"></div>
+            </div>
+            <div class="fg"><label class="fl">Key Amenities</label><input class="fi" type="text" placeholder="e.g. Borehole, Generator, Gym, CCTV, Parking"></div>
+            <div class="fg"><label class="fl">Listing Plan</label><select class="fi"><option>Free (1 listing)</option><option>Pay-per-Listing — KES 500 / 30 days</option><option>Boost — KES 1,200 / 7 days (Top of Search)</option><option>Featured Banner — KES 5,000 / 30 days</option></select></div>
+            <div class="fg"><label class="fl">WhatsApp / Phone</label><input class="fi" type="tel" placeholder="e.g. 0712 345 678"></div>
+
+            <!-- PHOTO UPLOAD — FIXED -->
+            <div class="fg">
+              <label class="fl">Upload Room Photos (up to 10)</label>
+              <div class="photo-upload-area" id="photoUploadArea">
+                <div class="photo-drop-zone" id="photoDropZone">
+                  <input type="file" id="photoFileInput" accept="image/*" multiple onchange="handlePhotoUpload(event)">
+                  <div class="puz-icon">📷</div>
+                  <div class="puz-text"><strong>Click anywhere here to upload photos</strong><br>or drag & drop JPG / PNG / WEBP · Max 10 images<br><span style="font-size:.68rem;opacity:.5;">High-quality room photos get 3× more enquiries</span></div>
+                </div>
+                <div class="photo-preview-grid" id="photoPreviewGrid"></div>
+                <div class="photo-count" id="photoCount" style="display:none;"></div>
+              </div>
+            </div>
+
+            <button class="smbtn" onclick="submitListing()">🚀 Publish Listing on NestDrift Kenya</button>
+            <div class="success-msg" id="listingSuccess">✅ Your listing is live! Tenants across Kenya can now discover your apartment.</div>
+          </div>
+        </div>
+      </div>
+      <!-- L-ANALYTICS -->
+      <div id="l-analytics" class="dash-panel">
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-num">1,247</div><div class="stat-label">Total Views (Apr)</div><div class="stat-change up">↑ 18% vs Mar</div></div>
+          <div class="stat-card green"><div class="stat-num">34</div><div class="stat-label">Total Enquiries</div><div class="stat-change up">↑ 22% vs Mar</div></div>
+          <div class="stat-card blue"><div class="stat-num">2.7%</div><div class="stat-label">View-to-Enquiry Rate</div><div class="stat-change up">↑ above avg 1.9%</div></div>
+          <div class="stat-card purple"><div class="stat-num">4.2 days</div><div class="stat-label">Avg Days to Enquiry</div><div class="stat-change up">↓ faster than avg</div></div>
+        </div>
+        <div class="dash-card">
+          <h3>Views by Listing (April 2026)</h3>
+          <div class="chart-area" id="analyticsChart"></div>
+          <div class="chart-labels" id="analyticsChartLabels"></div>
+        </div>
+        <div class="dash-card">
+          <h3>Traffic Sources</h3>
+          <table class="data-table">
+            <thead><tr><th>Source</th><th>Visits</th><th>% of Total</th><th>Enquiries</th></tr></thead>
+            <tbody>
+              <tr><td>🔍 Organic Search</td><td>612</td><td>49%</td><td>18</td></tr>
+              <tr><td>📱 Mobile App</td><td>380</td><td>30%</td><td>10</td></tr>
+              <tr><td>🔗 Direct / Referral</td><td>155</td><td>12%</td><td>4</td></tr>
+              <tr><td>📧 Email Alerts</td><td>100</td><td>9%</td><td>2</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- /landlord -->
+
+<!-- ════════════════════════════════════════
+     PRICING PAGE
+════════════════════════════════════════ -->
+<div id="page-pricing" class="page">
+<section class="pricing-sec">
+  <div class="sl">Revenue Model</div>
+  <h2 class="st" style="margin-bottom:10px;">Simple, <em>transparent</em> pricing.</h2>
+  <p style="font-size:.88rem;opacity:.6;max-width:500px;line-height:1.7;margin-bottom:36px;">NestDrift Kenya is free to browse. Sign in free to see exact prices. Premium features for landlords, agents, and tenants — all in KES.</p>
+  <div class="ptabs">
+    <button class="ptab active" onclick="showPTab('pt-ll',this)">🏠 Landlord Listings</button>
+    <button class="ptab" onclick="showPTab('pt-sub',this)">📋 Agency Plans</button>
+    <button class="ptab" onclick="showPTab('pt-leads',this)">📞 Lead Fees</button>
+    <button class="ptab" onclick="showPTab('pt-tenant',this)">🔑 Tenant Services</button>
+    <button class="ptab" onclick="showPTab('pt-aff',this)">🤝 Affiliates</button>
+    <button class="ptab" onclick="showPTab('pt-data',this)">📊 Data</button>
+  </div>
+  <div id="pt-ll" class="ppanel active">
+    <div class="plans-grid">
+      <div class="plan-card"><div class="plan-icon">🆓</div><div class="plan-name">Free Listing</div><div class="plan-price">KES 0<sub>/listing</sub></div><div class="plan-desc">1 active listing for first-time landlords.</div><div class="plan-div"></div><div class="plan-features"><div class="plan-feature"><span class="pfc">✓</span>1 active listing</div><div class="plan-feature"><span class="pfc">✓</span>5 photos</div><div class="plan-feature"><span class="pfc">✓</span>Standard placement</div></div><button class="plan-cta pcta-o">Get Started</button></div>
+      <div class="plan-card pop"><div class="plan-icon">🚀</div><div class="plan-name">Pay-per-Listing</div><div class="plan-price">KES 500<sub>/30 days</sub></div><div class="plan-desc">Per unit. Perfect for individual landlords.</div><div class="plan-div"></div><div class="plan-features"><div class="plan-feature"><span class="pfc">✓</span>30-day live listing</div><div class="plan-feature"><span class="pfc">✓</span>10 photos + gallery</div><div class="plan-feature"><span class="pfc">✓</span>Enquiry analytics</div><div class="plan-feature"><span class="pfc">✓</span>WhatsApp direct</div></div><button class="plan-cta pcta-p">Post Listing</button></div>
+      <div class="plan-card"><div class="plan-icon">⚡</div><div class="plan-name">Boost</div><div class="plan-price">KES 1,200<sub>/7 days</sub></div><div class="plan-desc">Top of county search results for 7 days.</div><div class="plan-div"></div><div class="plan-features"><div class="plan-feature"><span class="pfc">✓</span>Top placement 7 days</div><div class="plan-feature"><span class="pfc">✓</span>Impression analytics</div><div class="plan-feature"><span class="pfc">✓</span>"Boosted" badge</div></div><button class="plan-cta pcta-o">Boost Now</button></div>
+      <div class="plan-card dark"><div class="plan-icon">🌟</div><div class="plan-name">Featured Banner</div><div class="plan-price">KES 5,000<sub>/30 days</sub></div><div class="plan-desc">Homepage banner carousel placement.</div><div class="plan-div"></div><div class="plan-features"><div class="plan-feature"><span class="pfc">✓</span>Homepage banner</div><div class="plan-feature"><span class="pfc">✓</span>⭐ Featured badge</div><div class="plan-feature"><span class="pfc">✓</span>Priority in Matchmaker</div></div><button class="plan-cta pcta-d">Get Featured</button></div>
+    </div>
+  </div>
+  <div id="pt-sub" class="ppanel">
+    <div class="plans-grid">
+      <div class="plan-card"><div class="plan-icon">🟢</div><div class="plan-name">Starter</div><div class="plan-price">KES 0<sub>/mo</sub></div><div class="plan-desc">Individual landlords starting out.</div><div class="plan-div"></div><div class="plan-features"><div class="plan-feature"><span class="pfc">✓</span>1 listing</div><div class="plan-feature"><span class="pfc">✓</span>Basic analytics</div></div><button class="plan-cta pcta-o">Free Forever</button></div>
+      <div class="plan-card pop"><div class="plan-icon">🏡</div><div class="plan-name">Agent Basic</div><div class="plan-price">KES 2,500<sub>/mo</sub></div><div class="plan-desc">Agents managing up to 10 units.</div><div class="plan-div"></div><div class="plan-features"><div class="plan-feature"><span class="pfc">✓</span>10 listings</div><div class="plan-feature"><span class="pfc">✓</span>Priority support</div><div class="plan-feature"><span class="pfc">✓</span>Lead notifications</div></div><button class="plan-cta pcta-p">Start Plan</button></div>
+      <div class="plan-card"><div class="plan-icon">🏢</div><div class="plan-name">Agency Pro</div><div class="plan-price">KES 7,500<sub>/mo</sub></div><div class="plan-desc">50+ units with full analytics.</div><div class="plan-div"></div><div class="plan-features"><div class="plan-feature"><span class="pfc">✓</span>50 listings</div><div class="plan-feature"><span class="pfc">✓</span>Advanced analytics</div><div class="plan-feature"><span class="pfc">✓</span>Bulk upload</div></div><button class="plan-cta pcta-o">Upgrade</button></div>
+      <div class="plan-card dark"><div class="plan-icon">🏙️</div><div class="plan-name">Enterprise</div><div class="plan-price">KES 18,000<sub>/mo</sub></div><div class="plan-desc">Unlimited inventory + API access.</div><div class="plan-div"></div><div class="plan-features"><div class="plan-feature"><span class="pfc">✓</span>Unlimited listings</div><div class="plan-feature"><span class="pfc">✓</span>API + white-label</div><div class="plan-feature"><span class="pfc">✓</span>Account manager</div></div><button class="plan-cta pcta-d">Contact Sales</button></div>
+    </div>
+  </div>
+  <div id="pt-leads" class="ppanel">
+    <table class="ptable">
+      <thead><tr><th>Tenant Action</th><th>Fee</th><th>Payer</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Taps "WhatsApp" contact</td><td><span class="ph">KES 150</span></td><td><span class="tbadge tb-l">Landlord</span></td><td>Verified Kenyan number required</td></tr>
+        <tr><td>Books a viewing / tour</td><td><span class="ph">KES 300</span></td><td><span class="tbadge tb-l">Landlord</span></td><td>Capped at 20/month on Free plan</td></tr>
+        <tr><td>Submits application</td><td><span class="ph">KES 500</span></td><td><span class="tbadge tb-l">Landlord</span></td><td>Includes tenant profile</td></tr>
+        <tr><td>Confirmed lease referral</td><td><span class="ph">50% of 1st month rent</span></td><td><span class="tbadge tb-l">Landlord</span></td><td>e.g. KES 22,500 on KES 45K/mo unit</td></tr>
+      </tbody>
+    </table>
+    <p class="pnote">💡 Agency Pro & Enterprise get 30% discount on CPL rates.</p>
+  </div>
+  <div id="pt-tenant" class="ppanel">
+    <table class="ptable">
+      <thead><tr><th>Service</th><th>Price</th><th>Payer</th><th>What You Get</th></tr></thead>
+      <tbody>
+        <tr><td>Contact Unlock (per listing)</td><td><span class="ph">KES 300 one-time</span></td><td><span class="tbadge tb-t">Tenant</span></td><td>Full price breakdown + landlord contacts for that listing</td></tr>
+        <tr><td>Premium Search Alerts</td><td><span class="ph">KES 299 / month</span></td><td><span class="tbadge tb-t">Tenant</span></td><td>See listings 12 hours before public in Karen, Westlands, Nyali</td></tr>
+        <tr><td>Background Check Package</td><td><span class="ph">KES 1,500 one-time</span></td><td><span class="tbadge tb-t">Tenant</span></td><td>CRB + ID + employment. Reusable with any landlord on NestDrift</td></tr>
+        <tr><td>Verified Renter Badge</td><td><span class="ph">KES 500 one-time</span></td><td><span class="tbadge tb-t">Tenant</span></td><td>Trust badge on profile — doubles landlord response rate</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div id="pt-aff" class="ppanel">
+    <table class="ptable">
+      <thead><tr><th>Partner</th><th>Commission</th><th>Est. KES</th><th>Payer</th></tr></thead>
+      <tbody>
+        <tr><td>Moving companies</td><td>8% of job</td><td><span class="ph">KES 800–3K</span></td><td><span class="tbadge tb-p">Partner</span></td></tr>
+        <tr><td>Renters' insurance</td><td>15% of premium</td><td><span class="ph">KES 300–600</span></td><td><span class="tbadge tb-p">Partner</span></td></tr>
+        <tr><td>ISPs (Safaricom, Zuku)</td><td>Flat referral</td><td><span class="ph">KES 500–1K</span></td><td><span class="tbadge tb-p">Partner</span></td></tr>
+        <tr><td>Mortgage brokers</td><td>1% of loan</td><td><span class="ph">KES 5K–50K+</span></td><td><span class="tbadge tb-p">Partner</span></td></tr>
+      </tbody>
+    </table>
+    <p class="pnote">🤝 Shown at Move-In Checklist after confirmed match. All placements transparently labelled.</p>
+  </div>
+  <div id="pt-data" class="ppanel">
+    <div class="data-grid-3">
+      <div class="dcrd"><div class="dcrd-icon">📄</div><div class="dcrd-title">Quarterly Market Report</div><div class="dcrd-price">KES 15,000</div><div class="dcrd-desc">Median rent, vacancy rates, days-to-let by county. Quarterly.</div></div>
+      <div class="dcrd"><div class="dcrd-icon">🔌</div><div class="dcrd-title">Vacancy Rate API</div><div class="dcrd-price">KES 50,000 / year</div><div class="dcrd-desc">Live API for PropTech and urban researchers.</div></div>
+      <div class="dcrd"><div class="dcrd-icon">🗺️</div><div class="dcrd-title">Neighbourhood Heatmaps</div><div class="dcrd-price">Custom</div><div class="dcrd-desc">Demand heatmaps by estate for planners and NGOs.</div></div>
+    </div>
+    <p class="pnote" style="margin-top:16px;">🔒 All data products use fully anonymised, aggregated data only.</p>
+  </div>
+</section>
+</div><!-- /pricing -->
+
+<!-- ════════════════════════════════════════
+     ADMIN DASHBOARD (Admin only)
+════════════════════════════════════════ -->
+<div id="page-admin-dash" class="page">
+<div class="admin-dash">
+  <div class="admin-header">
+    <div>
+      <div style="font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:rgba(201,106,58,.8);margin-bottom:8px;">ADMIN PANEL · RESTRICTED ACCESS</div>
+      <div class="admin-title">NestDrift Kenya<br>Control Centre</div>
+    </div>
+    <span class="admin-badge">⚙️ ADMIN ACCESS</span>
+  </div>
+
+  <div class="admin-stats">
+    <div class="adstat"><div class="adstat-num">5,234</div><div class="adstat-lbl">Total Listings</div><div class="adstat-ch up">↑ 12% this month</div></div>
+    <div class="adstat"><div class="adstat-num">18,901</div><div class="adstat-lbl">Registered Users</div><div class="adstat-ch up">↑ 8% this month</div></div>
+    <div class="adstat"><div class="adstat-num">KES 1.24M</div><div class="adstat-lbl">Platform Revenue (Apr)</div><div class="adstat-ch up">↑ 24% vs Mar</div></div>
+    <div class="adstat"><div class="adstat-num">3,412</div><div class="adstat-lbl">M-PESA Transactions</div><div class="adstat-ch up">↑ 18% this month</div></div>
+    <div class="adstat"><div class="adstat-num">94.2%</div><div class="adstat-lbl">Payment Success Rate</div><div class="adstat-ch up">↑ 1.2pp vs Mar</div></div>
+  </div>
+
+  <!-- Revenue chart + Activity -->
+  <div class="admin-grid">
+    <div class="admin-card">
+      <h3>Monthly Revenue (KES)</h3>
+      <div class="revenue-bars" id="adminRevenueChart"></div>
+      <div class="rev-labels" id="adminRevenueLabels"></div>
+      <div style="display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;">
+        <div style="font-size:.72rem;color:rgba(255,255,255,.5);">🟠 Listing Fees</div>
+        <div style="font-size:.72rem;color:rgba(255,255,255,.5);">⚡ Lead Fees</div>
+        <div style="font-size:.72rem;color:rgba(255,255,255,.5);">💳 Subscriptions</div>
+        <div style="font-size:.72rem;color:rgba(255,255,255,.5);">🔒 Tenant Unlocks</div>
+      </div>
+    </div>
+    <div class="admin-card">
+      <h3>Live Activity Feed</h3>
+      <div class="activity-feed">
+        <div class="af-item"><div class="af-dot green"></div><div><div class="af-text">New tenant registered: <strong>Brian Kamau</strong> (Nairobi)</div><div class="af-time">2 minutes ago</div></div></div>
+        <div class="af-item"><div class="af-dot orange"></div><div><div class="af-text">Listing unlocked via M-PESA: <strong>Westlands Heights 3A</strong> — KES 300</div><div class="af-time">5 minutes ago</div></div></div>
+        <div class="af-item"><div class="af-dot blue"></div><div><div class="af-text">New listing published: <strong>Karen Villas Unit 2</strong> by Otieno Properties</div><div class="af-time">12 minutes ago</div></div></div>
+        <div class="af-item"><div class="af-dot yellow"></div><div><div class="af-text">Agency Pro subscription renewed: <strong>Nairobi Properties Ltd</strong> — KES 7,500</div><div class="af-time">18 minutes ago</div></div></div>
+        <div class="af-item"><div class="af-dot green"></div><div><div class="af-text">Successful lease referral: <strong>Milimani Lake View</strong> — KES 14,000 commission</div><div class="af-time">34 minutes ago</div></div></div>
+        <div class="af-item"><div class="af-dot orange"></div><div><div class="af-text">Featured listing purchased: <strong>Parklands 4-Bed</strong> — KES 5,000</div><div class="af-time">1 hour ago</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Listings + Users management -->
+  <div class="admin-grid">
+    <div class="admin-card">
+      <h3>Recent Listings — All Platforms</h3>
+      <table class="admin-table">
+        <thead><tr><th>Property</th><th>Landlord</th><th>County</th><th>Rent (KES)</th><th>Plan</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Westlands Hts 3A</td><td>J. Otieno</td><td>Nairobi</td><td>45,000</td><td><span class="astatus as-paid">Featured</span></td><td><span class="astatus as-active">Live</span></td></tr>
+          <tr><td>Nyali Ocean Breeze</td><td>A. Hassan</td><td>Mombasa</td><td>85,000</td><td><span class="astatus as-active">Boosted</span></td><td><span class="astatus as-active">Live</span></td></tr>
+          <tr><td>Milimani Lakeview</td><td>P. Ochieng</td><td>Kisumu</td><td>28,000</td><td><span class="astatus as-pending">Standard</span></td><td><span class="astatus as-pending">Review</span></td></tr>
+          <tr><td>Karen Villas Unit 2</td><td>M. Njoroge</td><td>Nairobi</td><td>110,000</td><td><span class="astatus as-active">Standard</span></td><td><span class="astatus as-active">Live</span></td></tr>
+          <tr><td>Nakuru Central Apt</td><td>R. Waweru</td><td>Nakuru</td><td>15,000</td><td><span class="astatus as-pending">Free</span></td><td><span class="astatus as-sus">Flagged</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="admin-card">
+      <h3>User Management</h3>
+      <table class="admin-table">
+        <thead><tr><th>User</th><th>Role</th><th>County</th><th>Joined</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td>Amina Wanjiku</td><td>Tenant</td><td>Nairobi</td><td>Apr 1</td><td><span class="astatus as-active">Active</span></td><td style="cursor:pointer;color:rgba(201,106,58,.8);">View</td></tr>
+          <tr><td>James Otieno</td><td>Landlord</td><td>Nairobi</td><td>Mar 12</td><td><span class="astatus as-active">Active</span></td><td style="cursor:pointer;color:rgba(201,106,58,.8);">View</td></tr>
+          <tr><td>Sandra Omondi</td><td>Tenant</td><td>Mombasa</td><td>Apr 10</td><td><span class="astatus as-active">Active</span></td><td style="cursor:pointer;color:rgba(201,106,58,.8);">View</td></tr>
+          <tr><td>K. Properties Ltd</td><td>Landlord</td><td>Nairobi</td><td>Feb 5</td><td><span class="astatus as-sus">Suspended</span></td><td style="cursor:pointer;color:#e74c3c;">Review</td></tr>
+          <tr><td>Brian Kamau</td><td>Tenant</td><td>Nairobi</td><td>Today</td><td><span class="astatus as-pending">New</span></td><td style="cursor:pointer;color:rgba(201,106,58,.8);">View</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Revenue breakdown + Payments -->
+  <div class="admin-grid">
+    <div class="admin-card">
+      <h3>Revenue by Stream (April 2026)</h3>
+      <table class="admin-table">
+        <thead><tr><th>Stream</th><th>Transactions</th><th>Revenue (KES)</th><th>% of Total</th></tr></thead>
+        <tbody>
+          <tr><td>🏠 Listing Fees</td><td>412</td><td>206,000</td><td>16.6%</td></tr>
+          <tr><td>⭐ Featured/Boost</td><td>89</td><td>278,000</td><td>22.4%</td></tr>
+          <tr><td>📋 Subscriptions</td><td>156</td><td>384,000</td><td>31.0%</td></tr>
+          <tr><td>📞 Lead Fees (CPL)</td><td>890</td><td>178,000</td><td>14.4%</td></tr>
+          <tr><td>🔒 Tenant Unlocks</td><td>1,204</td><td>120,400</td><td>9.7%</td></tr>
+          <tr><td>🤝 Affiliate Commissions</td><td>78</td><td>78,000</td><td>6.3%</td></tr>
+          <tr style="background:rgba(201,106,58,.1);"><td><strong>TOTAL</strong></td><td><strong>2,829</strong></td><td><strong style="color:#C96A3A;">1,244,400</strong></td><td><strong>100%</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="admin-card">
+      <h3>Recent Payments</h3>
+      <table class="admin-table">
+        <thead><tr><th>Description</th><th>Amount</th><th>Method</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Contact Unlock · Wanjiku</td><td>KES 300</td><td>M-PESA</td><td><span class="astatus as-paid">Paid</span></td></tr>
+          <tr><td>Agency Pro · Otieno</td><td>KES 7,500</td><td>M-PESA</td><td><span class="astatus as-paid">Paid</span></td></tr>
+          <tr><td>Featured Banner · Hassan</td><td>KES 5,000</td><td>Card</td><td><span class="astatus as-paid">Paid</span></td></tr>
+          <tr><td>Lease Referral · Ochieng</td><td>KES 14,000</td><td>Auto</td><td><span class="astatus as-paid">Paid</span></td></tr>
+          <tr><td>Contact Unlock · Kamau</td><td>KES 300</td><td>M-PESA</td><td><span class="astatus as-pending">Pending</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:24px;padding:16px;background:rgba(255,255,255,.03);border-radius:14px;color:rgba(255,255,255,.3);font-size:.75rem;">
+    NestDrift Kenya Admin Panel · v2.0 · All data is live · Access restricted to administrators only
+  </div>
+</div>
+</div><!-- /admin -->
+
+<footer>
+  <div class="footer-logo">Nest<span>Drift</span></div>
+  <div class="footer-links"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">For Landlords</a><a href="#">Help</a></div>
+  <div class="footer-copy">© 2026 NestDrift Kenya</div>
+</footer>
+
+<script>
+// ══════════════════════════════════
+// APP STATE
+// ══════════════════════════════════
+let currentUser = null; // {name, role, email}
+let selectedRole = 'tenant';
+let selectedPayMethod = 'mpesa';
+let currentListing = null;
+let uploadedPhotos = [];
+
+const LISTINGS = [
+  {id:1,name:'Westlands Heights, Unit 3A',area:'Westlands',county:'Nairobi',beds:'2 Beds',bath:'1 Bath',size:'82 m²',pricePublic:'from KES 43,000',priceAuth:'KES 45,000',deposit:'KES 90,000 (2 months)',service:'KES 2,500/mo',tags:['Parking','Borehole','Gym','CCTV'],badge:'featured',badgeLabel:'⭐ Featured',slides:['🏢','🛋️','🌿'],bg:['linear-gradient(135deg,#C8A882,#9B7A5C)','linear-gradient(135deg,#9B7A5C,#6B4F3A)','linear-gradient(135deg,#7A9B6B,#5C7A50)']},
+  {id:2,name:'Kilimani Garden Suites',area:'Kilimani',county:'Nairobi',beds:'Studio',bath:'1 Bath',size:'38 m²',pricePublic:'from KES 20,000',priceAuth:'KES 22,000',deposit:'KES 44,000 (2 months)',service:'KES 1,500/mo',tags:['WiFi Incl.','Water 24hr','CCTV'],badge:'flex-m',badgeLabel:'◈ Flex Match',slides:['🏠','🌳'],bg:['linear-gradient(135deg,#B8956A,#7A5C3A)','linear-gradient(135deg,#6A8B7A,#4A6B5A)']},
+  {id:3,name:'Nyali Ocean Breeze Apts',area:'Nyali',county:'Mombasa',beds:'3 Beds',bath:'2 Baths',size:'120 m²',pricePublic:'from KES 80,000',priceAuth:'KES 85,000',deposit:'KES 170,000 (2 months)',service:'KES 5,000/mo',tags:['Ocean View','Pool','Generator','Pet OK'],badge:'perfect',badgeLabel:'✦ Perfect Match',slides:['🌊','🏖️','🌴'],bg:['linear-gradient(135deg,#5A8A9A,#3A6A7A)','linear-gradient(135deg,#7A9BAA,#5A7B8A)','linear-gradient(135deg,#9ABAAA,#7A9A8A)']},
+  {id:4,name:'Milimani Lake View Flats',area:'Milimani',county:'Kisumu',beds:'2 Beds',bath:'1 Bath',size:'75 m²',pricePublic:'from KES 26,000',priceAuth:'KES 28,000',deposit:'KES 56,000 (2 months)',service:'KES 1,200/mo',tags:['Lake View','Solar','Compound'],badge:'flex-m',badgeLabel:'◈ Flex Match',slides:['🏡','🌿'],bg:['linear-gradient(135deg,#AA8A6A,#7A5A3A)','linear-gradient(135deg,#8AAA6A,#5A7A3A)']},
+  {id:5,name:'Parklands Executive Residences',area:'Parklands',county:'Nairobi',beds:'4 Beds',bath:'3 Baths',size:'220 m²',pricePublic:'from KES 175,000',priceAuth:'KES 180,000',deposit:'KES 360,000 (2 months)',service:'KES 12,000/mo',tags:['Rooftop','Gym','Concierge','2 Parking'],badge:'perfect',badgeLabel:'✦ Perfect Match',slides:['🏢','🛏️','🍽️'],bg:['linear-gradient(135deg,#C96A3A,#A04A2A)','linear-gradient(135deg,#A04A2A,#703020)','linear-gradient(135deg,#C8A882,#9B7A5C)']},
+  {id:6,name:'Nakuru Central Apartments',area:'Nakuru Town',county:'Nakuru',beds:'1 Bed',bath:'1 Bath',size:'45 m²',pricePublic:'from KES 14,000',priceAuth:'KES 15,000',deposit:'KES 30,000 (2 months)',service:'KES 800/mo',tags:['Town Centre','Water Tank','Guard'],badge:'flex-m',badgeLabel:'◈ Flex Match',slides:['🏘️','🌙'],bg:['linear-gradient(135deg,#6A7A9A,#4A5A7A)','linear-gradient(135deg,#4A5A7A,#2A3A5A)']}
+];
+
+// ══════════════════════════════════
+// RENDER LISTINGS
+// ══════════════════════════════════
+function renderListings(){
+  const grid = document.getElementById('listingsGrid');
+  grid.innerHTML = '';
+  LISTINGS.forEach(l => {
+    const isAuth = currentUser !== null;
+    const dotHtml = l.slides.map((_,i)=>`<span class="cdot${i===0?' on':''}"></span>`).join('');
+    const slideHtml = l.slides.map((e,i)=>`<div class="car-slide"><div class="slide-ph" style="background:${l.bg[i]}">${e}</div></div>`).join('');
+    const priceHtml = isAuth
+      ? `<div class="lprice-auth"><div><span class="price-num">${l.priceAuth}</span> <span class="price-per">/ month</span></div><div class="price-breakdown">Deposit: ${l.deposit} · Service: ${l.service}</div></div>`
+      : `<div class="lprice-public"><span class="price-num">${l.pricePublic}</span><span class="price-per">/mo</span>
+         <button class="lprice-lock" onclick="event.stopPropagation();triggerContactGate(${l.id})"><span class="lock-icon">🔒</span><span class="lock-text">Exact price</span></button>
+        </div>`;
+    const contactHtml = isAuth
+      ? `<button class="contact-gate" onclick="triggerContactGate(${l.id})"><span>📱</span><span>Contact Landlord / Book Tour</span></button>`
+      : `<button class="contact-gate" onclick="triggerContactGate(${l.id})"><span>🔒</span><span>Sign in + KES 300 to contact landlord</span></button>`;
+    grid.innerHTML += `
+    <div class="lcard">
+      <span class="lbadge ${l.badge}">${l.badgeLabel}</span>
+      <button class="lsave" onclick="event.stopPropagation();this.textContent=this.textContent==='🤍'?'❤️':'🤍'">🤍</button>
+      <div class="carousel" data-idx="0">
+        <div class="car-inner">${slideHtml}</div>
+        <button class="car-btn car-prev" onclick="event.stopPropagation();carSlide(this,-1)">‹</button>
+        <button class="car-btn car-next" onclick="event.stopPropagation();carSlide(this,1)">›</button>
+        <div class="car-dots">${dotHtml}</div>
+      </div>
+      <div class="lbody">
+        <div class="lloc">📍 ${l.area} · ${l.county} County</div>
+        <div class="lname">${l.name}</div>
+        <div class="lreg">${l.beds} · ${l.bath} · ${l.size}</div>
+        ${priceHtml}
+        <div class="lmeta"><span class="lm">🛏 ${l.beds}</span><span class="lm">🚿 ${l.bath}</span><span class="lm">📐 ${l.size}</span></div>
+        <div class="ltags">${l.tags.map(t=>`<span class="ltag">${t}</span>`).join('')}</div>
+        ${contactHtml}
+      </div>
+    </div>`;
+  });
+}
+
+// ══════════════════════════════════
+// CAROUSEL
+// ══════════════════════════════════
+function carSlide(btn,dir){
+  const car=btn.closest('.carousel');
+  const inner=car.querySelector('.car-inner');
+  const slides=car.querySelectorAll('.car-slide');
+  const dots=car.querySelectorAll('.cdot');
+  let idx=parseInt(car.dataset.idx)+dir;
+  if(idx<0)idx=slides.length-1;
+  if(idx>=slides.length)idx=0;
+  car.dataset.idx=idx;
+  inner.style.transform=`translateX(-${idx*100}%)`;
+  dots.forEach((d,i)=>d.classList.toggle('on',i===idx));
+}
+
+// ══════════════════════════════════
+// AUTH
+// ══════════════════════════════════
+// ── ADMIN SECRET ──
+// To access admin: type  #nestdrift-admin-2026  in the browser address bar
+const ADMIN_SECRET_URL = 'nestdrift-admin-2026';
+const ADMIN_PASSWORD   = 'NestDrift@Admin2026'; // change this to your own password
+
+function checkSecretURL(){
+  if(window.location.hash === '#' + ADMIN_SECRET_URL){
+    // Show hidden admin option in login
+    selectedRole = 'admin';
+    const rs = document.getElementById('roleSelect');
+    // Add admin button if not already there
+    if(!document.getElementById('adminRoleBtn')){
+      const adminBtn = document.createElement('div');
+      adminBtn.className = 'role-btn';
+      adminBtn.id = 'adminRoleBtn';
+      adminBtn.style.borderColor = 'rgba(142,68,173,.4)';
+      adminBtn.innerHTML = '<span class="role-icon">⚙️</span><span class="role-name" style="color:#8E44AD;">Admin</span>';
+      adminBtn.onclick = function(){ selectRole('admin', adminBtn); };
+      rs.style.gridTemplateColumns = '1fr 1fr 1fr';
+      rs.appendChild(adminBtn);
+      adminBtn.classList.add('active');
+      document.querySelectorAll('.role-btn').forEach(b=>{ if(b!==adminBtn) b.classList.remove('active'); });
+    }
+    document.getElementById('adminPassGroup').classList.remove('hidden');
+    document.getElementById('authTitle').textContent = '⚙️ Admin Access';
+    document.getElementById('authSubtitle').textContent = 'Restricted area. Enter your admin credentials.';
+    openModal('authModal');
+    // Clear hash so it's not visible in URL
+    history.replaceState(null,'',window.location.pathname);
+  }
+}
+window.addEventListener('hashchange', checkSecretURL);
+window.addEventListener('load', checkSecretURL);
+
+function selectRole(role,el){
+  selectedRole=role;
+  document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  // Show admin password field only when admin role selected
+  document.getElementById('adminPassGroup').classList.toggle('hidden', role !== 'admin');
+  document.getElementById('loginError').style.display = 'none';
+}
+function showRegister(){document.getElementById('loginForm').classList.add('hidden');document.getElementById('registerForm').classList.remove('hidden');document.getElementById('authTitle').textContent='Join NestDrift Kenya';document.getElementById('authSubtitle').textContent='Create your account to browse, save and contact landlords.';}
+function showLogin(){document.getElementById('registerForm').classList.add('hidden');document.getElementById('loginForm').classList.remove('hidden');document.getElementById('authTitle').textContent='Welcome Back';document.getElementById('authSubtitle').textContent='Sign in to access full pricing, contact landlords, and save listings.';}
+function doLogin(){
+  const email=document.getElementById('loginEmail').value||'demo@nestdrift.co.ke';
+  // Admin password check
+  if(selectedRole==='admin'){
+    const enteredKey = document.getElementById('adminPass').value;
+    if(enteredKey !== ADMIN_PASSWORD){
+      document.getElementById('loginError').style.display='block';
+      return;
+    }
+  }
+  document.getElementById('loginError').style.display='none';
+  const names={'tenant':'Amina Wanjiku','landlord':'James Otieno','admin':'Admin User'};
+  currentUser={name:names[selectedRole],role:selectedRole,email};
+  updateNavForUser();
+  closeModal('authModal');
+  renderListings();
+  if(selectedRole==='landlord'){showPage('landlord-portal',document.getElementById('navLandlord'));}
+  else if(selectedRole==='admin'){showPage('admin-dash',document.getElementById('navAdmin'));}
+  else{showPage('tenant-dash',document.getElementById('navTenant'));}
+}
+function doRegister(){doLogin();}
+function doLogout(){
+  currentUser=null;
+  document.getElementById('navUser').classList.remove('hidden');
+  document.getElementById('navLoggedIn').classList.add('hidden');
+  document.getElementById('navTenant').classList.add('hidden');
+  document.getElementById('navLandlord').classList.add('hidden');
+  document.getElementById('navAdmin').classList.add('hidden');
+  renderListings();
+  showPage('home',document.querySelectorAll('.nav-tab')[0]);
+}
+function updateNavForUser(){
+  if(!currentUser)return;
+  document.getElementById('navUser').classList.add('hidden');
+  document.getElementById('navLoggedIn').classList.remove('hidden');
+  const av=document.getElementById('navAvatar');
+  av.textContent=currentUser.name.charAt(0);
+  const rb=document.getElementById('navRoleBadge');
+  const badges={'tenant':'role-tenant-badge','landlord':'role-landlord-badge','admin':'role-admin-badge'};
+  rb.className='nav-role-badge '+badges[currentUser.role];
+  rb.textContent={tenant:'🏠 Tenant',landlord:'🔑 Landlord',admin:'⚙️ Admin'}[currentUser.role];
+  document.getElementById('navTenant').classList.toggle('hidden',currentUser.role!=='tenant');
+  document.getElementById('navLandlord').classList.toggle('hidden',currentUser.role!=='landlord');
+  document.getElementById('navAdmin').classList.toggle('hidden',currentUser.role!=='admin');
+  if(currentUser.name){document.getElementById('tenantName').textContent=currentUser.name;document.getElementById('landlordName').textContent=currentUser.name;}
+}
+
+// ══════════════════════════════════
+// CONTACT / PAYWALL
+// ══════════════════════════════════
+function triggerContactGate(listingId){
+  currentListing=LISTINGS.find(l=>l.id===listingId);
+  if(!currentUser){openModal('authModal');return;}
+  document.getElementById('payPropName').textContent=currentListing.name;
+  document.getElementById('payPropLoc').textContent=currentListing.area+' · '+currentListing.county;
+  openModal('payModal');
+}
+function selectPay(method,el){
+  selectedPayMethod=method;
+  document.querySelectorAll('.pay-opt').forEach(o=>o.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('mpesa-section').classList.toggle('hidden',method!=='mpesa');
+  document.getElementById('card-section').classList.toggle('hidden',method!=='card');
+}
+function processPayment(){
+  const btn=document.getElementById('payBtn');
+  btn.textContent='⏳ Processing…';
+  btn.classList.add('pay-processing');
+  btn.disabled=true;
+  setTimeout(()=>{
+    btn.textContent='✓ Pay & Unlock Details';
+    btn.classList.remove('pay-processing');
+    btn.disabled=false;
+    closeModal('payModal');
+    // Show contact details
+    document.getElementById('ctPropName').textContent=currentListing.name;
+    document.getElementById('ctFullPrice').textContent=currentListing.priceAuth+' / month';
+    document.getElementById('ctDeposit').textContent=currentListing.deposit;
+    document.getElementById('ctService').textContent=currentListing.service;
+    openModal('contactModal');
+    renderListings(); // refresh to show authenticated price
+  },2000);
+}
+
+// ══════════════════════════════════
+// PHOTO UPLOAD — FIXED
+// ══════════════════════════════════
+function handlePhotoUpload(event){
+  const files = Array.from(event.target.files);
+  const remaining = 10 - uploadedPhotos.length;
+  const toAdd = files.slice(0, remaining);
+  toAdd.forEach(file => {
+    if(!file.type.startsWith('image/'))return;
+    const reader = new FileReader();
+    reader.onload = function(e){
+      uploadedPhotos.push({src:e.target.result, name:file.name});
+      renderPhotoPreview();
+    };
+    reader.readAsDataURL(file);
+  });
+  // Reset input so same files can be re-selected
+  event.target.value='';
+}
+function renderPhotoPreview(){
+  const grid = document.getElementById('photoPreviewGrid');
+  const count = document.getElementById('photoCount');
+  grid.innerHTML = '';
+  uploadedPhotos.forEach((photo,i)=>{
+    const thumb = document.createElement('div');
+    thumb.className='photo-thumb';
+    thumb.innerHTML=`<img src="${photo.src}" alt="${photo.name}"><button class="del-btn" onclick="removePhoto(${i})">×</button>`;
+    grid.appendChild(thumb);
+  });
+  if(uploadedPhotos.length>0){
+    count.style.display='block';
+    count.textContent=`${uploadedPhotos.length}/10 photos uploaded`;
+    document.querySelector('.photo-drop-zone').style.borderBottom = uploadedPhotos.length>0?'1px solid var(--fog)':'none';
+  } else {
+    count.style.display='none';
+  }
+}
+function removePhoto(index){
+  uploadedPhotos.splice(index,1);
+  renderPhotoPreview();
+}
+// Drag and drop support
+document.addEventListener('DOMContentLoaded',()=>{
+  const area = document.getElementById('photoUploadArea');
+  if(area){
+    area.addEventListener('dragover',e=>{e.preventDefault();area.classList.add('drag-over');});
+    area.addEventListener('dragleave',()=>area.classList.remove('drag-over'));
+    area.addEventListener('drop',e=>{
+      e.preventDefault();
+      area.classList.remove('drag-over');
+      const fakeEvent = {target:{files:e.dataTransfer.files,value:''}};
+      handlePhotoUpload(fakeEvent);
+    });
+  }
+});
+
+function submitListing(){
+  const btn=document.querySelector('#l-addlisting .smbtn');
+  btn.textContent='🚀 Publishing…';
+  setTimeout(()=>{
+    btn.textContent='🚀 Publish Listing on NestDrift Kenya';
+    document.getElementById('listingSuccess').style.display='block';
+    uploadedPhotos=[];
+    renderPhotoPreview();
+    setTimeout(()=>document.getElementById('listingSuccess').style.display='none',5000);
+  },1500);
+}
+
+// ══════════════════════════════════
+// MODALS
+// ══════════════════════════════════
+function openModal(id){document.getElementById(id).classList.remove('hidden');}
+function closeModal(id){document.getElementById(id).classList.add('hidden');}
+document.addEventListener('click',e=>{
+  ['authModal','payModal','contactModal'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(e.target===el)closeModal(id);
+  });
+});
+
+// ══════════════════════════════════
+// PAGE NAVIGATION
+// ══════════════════════════════════
+function showPage(name,el){
+  // Guard admin page
+  if(name==='admin-dash'&&(!currentUser||currentUser.role!=='admin')){openModal('authModal');return;}
+  if((name==='tenant-dash')&&(!currentUser||currentUser.role!=='tenant')){openModal('authModal');return;}
+  if((name==='landlord-portal')&&(!currentUser||currentUser.role!=='landlord')){openModal('authModal');return;}
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(el)el.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ══════════════════════════════════
+// DASH PANELS
+// ══════════════════════════════════
+function showDashPanel(id,el){
+  const parent=document.getElementById(id).closest('.dash-main');
+  parent.querySelectorAll('.dash-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const sidebar=parent.closest('.dash-grid').querySelector('.sidebar-nav');
+  if(sidebar)sidebar.querySelectorAll('.snav-item').forEach(i=>i.classList.remove('active'));
+  if(el)el.classList.add('active');
+}
+
+// ══════════════════════════════════
+// PRICING TABS
+// ══════════════════════════════════
+function showPTab(id,el){
+  document.querySelectorAll('.ppanel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+}
+
+// ══════════════════════════════════
+// CHARTS
+// ══════════════════════════════════
+function buildChart(containerId, labelsId, data, labels, colorClass){
+  const c=document.getElementById(containerId);
+  if(!c)return;
+  const max=Math.max(...data);
+  c.innerHTML=data.map((v,i)=>`<div class="bar ${colorClass}" style="height:${Math.round((v/max)*100)}%" data-val="${labels[i]}"></div>`).join('');
+  if(labelsId){const l=document.getElementById(labelsId);if(l)l.innerHTML=labels.map(lb=>`<div class="chart-label">${lb}</div>`).join('');}
+}
+window.addEventListener('DOMContentLoaded',()=>{
+  renderListings();
+  buildChart('landlordChart','landlordChartLabels',[142,89,67,54,38,22,18],'Jan,Feb,Mar,Apr,May,Jun,Jul'.split(','),'');
+  buildChart('analyticsChart','analyticsChartLabels',[142,89,67,54,38,22],'WH3A,KGS,NOB,MLV,PE4,NCA'.split(','),'green-bar');
+  // Admin revenue chart
+  const rc=document.getElementById('adminRevenueChart');
+  if(rc){
+    const vals=[680,720,890,980,1100,1244];
+    const max=Math.max(...vals);
+    const months=['Nov','Dec','Jan','Feb','Mar','Apr'];
+    rc.innerHTML=vals.map((v,i)=>`<div class="rev-bar" style="height:${Math.round((v/max)*100)}%" data-val="KES ${v}K"></div>`).join('');
+    const rl=document.getElementById('adminRevenueLabels');
+    if(rl)rl.innerHTML=months.map(m=>`<div class="rev-label">${m}</div>`).join('');
+  }
+});
+</script>
+</body>
+</html>
